@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Sat Feb 24 19:00:58 2024
--- Last update : Tue Feb 27 11:30:12 2024
+-- Last update : Tue Feb 27 15:12:41 2024
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -58,6 +58,7 @@ architecture arch of pcg_64 is
   signal state_r       : unsigned(63 downto 0);
   signal gen_1_r       : std_logic;
   signal gen_2_r       : std_logic;
+  signal state_mult_r  : unsigned(127 downto 0);
   signal right_shfts_r : integer range 0 to 31;
   signal left_shfts_r  : integer range 0 to 31;
   signal gen_stage_2_r : unsigned(63 downto 0);
@@ -157,7 +158,8 @@ begin
 
     -- to hold the larger multiplication and addition result of
     -- state before trancating
-    variable state_mult_add_v : unsigned(127 downto 0);
+    variable state_mult_v : unsigned(127 downto 0);
+    variable state_add_v  : unsigned(127 downto 0);
 
 
   begin
@@ -206,6 +208,8 @@ begin
           -- 2s complement (with ommiting the sign bit) ANDed with 31 ("11111")
           left_shfts_v := to_integer(unsigned(right_shfts_2scomplement_v and right_shfts_31_signed_v));
           -- end gen_stage_1 by storing variables to registers
+          state_mult_r  <= state_r * unsigned(mult_r);
+          --state_mult_r  <= state_mult_v;
           gen_stage_2_r <= stage_2_v;
           right_shfts_r <= right_shfts_v;
           left_shfts_r  <= left_shfts_v; --to_integer(unsigned(right_shfts_2scomplement_v(4 downto 0)));
@@ -217,14 +221,14 @@ begin
         -- Gen Stage 2
         -----------------------------------------------------------------------
         if (gen_2_r = '1') then
-          stage_2_rot_r_v  := shift_right(gen_stage_2_r,right_shfts_r);
-          stage_2_rot_l_v  := shift_left(gen_stage_2_r,left_shfts_r);
-          state_mult_add_v := state_r * unsigned(mult_r) + unsigned(incr_r);
+          stage_2_rot_r_v := shift_right(gen_stage_2_r,right_shfts_r);
+          stage_2_rot_l_v := shift_left(gen_stage_2_r,left_shfts_r);
+          state_add_v     := state_mult_v + unsigned(incr_r);
           if (reseed_r = '1') then
-            state_r <= unsigned(state_mult_add_v(63 downto 0));
+            state_r <= unsigned(state_add_v(63 downto 0));
           end if;
           gen_word_v := stage_2_rot_r_v or stage_2_rot_l_v;
-          gen_word_r  <= gen_word_v(31 downto 0);
+          gen_word_r <= gen_word_v(31 downto 0);
           gen_1_r    <= '1';
           gen_2_r    <= '0';
         end if;
