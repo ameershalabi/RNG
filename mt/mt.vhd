@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Mon Feb 19 18:57:40 2024
--- Last update : Wed Feb 28 12:38:35 2024
+-- Last update : Wed Feb 28 19:18:02 2024
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 --------------------------------------------------------------------------------
@@ -45,8 +45,8 @@ architecture mt_32_arch of mt_32 is
 
   -- constants (change constants depending on desired coefficients)
   -- current coefficients are ones chosen by myself. A list of changable
-  -- coefficients for width 32-bit can be found in the mt_algo.txt
-  -- prime choosen is 521 mersenne prime
+  -- coefficients for width 32-bit can be found in the config_table.txt
+  -- prime choosen is 3217 mersenne prime
 
   -- w: word size (in number of bits)
   constant w_data_width_c : integer := 32;
