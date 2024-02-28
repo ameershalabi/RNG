@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Tue Feb 1  19:38:26 2024
--- Last update : Sun Feb 18 14:11:16 2024
+-- Last update : Wed Feb 28 19:04:15 2024
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 -------------------------------------------------------------------------------
@@ -25,8 +25,8 @@ use work.amshal_misc_pkg.all;
 
 entity select_slide_rand is
     generic(
-        w_LFSR_g   : natural := 4;
-        w_slider_g : natural := 2
+        w_LFSR_g   : natural := 32;
+        w_slider_g : natural := 4
     );
     port (
         clk : in std_logic; -- clock pin
@@ -61,9 +61,9 @@ architecture select_slide_rand_arch of select_slide_rand is
     end function check_slider_width;
 
     function get_RAND_LFSRs_width return integer is
-        variable w_RAND_LFSRs : integer range 1 to 32;
+        variable w_RAND_LFSRs : integer range 2 to 32;
     begin
-        if w_LFSR_g > 32 then
+        if w_LFSR_g < 2 or w_LFSR_g > 32 then
             w_RAND_LFSRs := 32;
         else
             w_RAND_LFSRs := w_LFSR_g;
@@ -80,7 +80,6 @@ architecture select_slide_rand_arch of select_slide_rand is
     -- ctrl signals
     signal enb_r : std_logic;
     signal clr_r : std_logic;
-    signal n_rst : std_logic;
 
 
     -- input registers
@@ -90,8 +89,8 @@ architecture select_slide_rand_arch of select_slide_rand is
     -- init registers
     signal selector_LFSR_data_in_r : std_logic_vector(w_LFSR_c-1 downto 0);
     type LFSR_data_arr_t is array(0 to 2**w_slider_c-1) of std_logic_vector(w_LFSR_c-1 downto 0);
-    signal LFSR_RAND_in_arr   : LFSR_data_arr_t;
-    signal init_done_r        : std_logic;
+    signal LFSR_RAND_in_arr : LFSR_data_arr_t;
+    signal init_done_r      : std_logic;
     --signal w_2_init_done_r    : std_logic;
     signal w_2_init_03_done_r : std_logic;
     signal w_2_init_12_done_r : std_logic;
@@ -118,10 +117,7 @@ architecture select_slide_rand_arch of select_slide_rand is
     signal output_rand_o_r : std_logic_vector(w_LFSR_c-1 downto 0);
 
 begin
-    -- current LFSRs used are active high reset. This is disimilar to this block
-    -- reset policy, which is active low reset. Therefore, a negation of the
-    -- block reset input is needed to synch reset accress of the different LFSRs
-    n_rst <= not rst;
+
 
     ----------------------------------------------------------------------------
     -- Stage 0 : register all input data into registers
@@ -185,7 +181,7 @@ begin
                         selector_LFSR_data_in_r <= init_data_r;
 
                         -- set data for first and last RAND_LFSR
-                        LFSR_RAND_in_arr(0)               <= not init_data_r;
+                        LFSR_RAND_in_arr(0)              <= not init_data_r;
                         LFSR_RAND_in_arr(2**w_slider_c-1) <= init_data_r;
 
                         w_2_init_03_done_r <= '1';
@@ -246,7 +242,7 @@ begin
 
             --w_4_init_done_r  <= '0';
             elsif rising_edge(clk) then
-                if (enb_r = '1') then                                -- active when block is enabled
+                if (enb_r = '1') then                                   -- active when block is enabled
                     if (init_r = '1' and w_2_init_12_done_r = '1') then -- the block is in init stage
                         reverse_RAND_LFSR_bits_loop : for xbit in 0 to w_LFSR_c-1 loop
                             LFSR_RAND_in_arr(2)(xbit)               <= LFSR_RAND_in_arr(0)(w_LFSR_c-1-xbit);
@@ -378,7 +374,7 @@ begin
         )
         port map (
             clk       => clk,
-            rst       => n_rst,
+            rst       => rst,
             load      => init_load,
             load_data => selector_LFSR_data_in_r,
             gen_e     => enb_gen_r,
@@ -434,7 +430,7 @@ begin
             )
             port map (
                 clk       => clk,
-                rst       => n_rst,
+                rst       => rst,
                 load      => init_load,
                 load_data => LFSR_RAND_in_arr(rand_lfsr),
                 gen_e     => enb_gen_r,
