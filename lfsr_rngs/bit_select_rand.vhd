@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Tue Feb 11 10:37:34 2024
--- Last update : Thu Feb 29 09:40:00 2024
+-- Last update : Thu Feb 29 22:33:47 2024
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 --------------------------------------------------------------------------------
@@ -61,9 +61,6 @@ architecture bit_select_rand_arch of bit_select_rand is
   -- ctrl signals
   signal enb_r : std_logic;
   signal clr_r : std_logic;
-  signal n_rst : std_logic;
-
-
 
   -- input registers
   signal init_data_r : std_logic_vector(w_LFSR_c-1 downto 0);
@@ -93,10 +90,6 @@ architecture bit_select_rand_arch of bit_select_rand is
   signal output_rand_o_r : std_logic_vector(w_LFSR_c-1 downto 0);
 
 begin
-  -- current LFSRs used are active high reset. This is disimilar to this block
-  -- reset policy, which is active low reset. Therefore, a negation of the
-  -- block reset input is needed to synch reset accress of the different LFSRs
-  n_rst <= not rst;
 
   ----------------------------------------------------------------------------
   -- Stage 0 : register all input data into registers
@@ -276,7 +269,7 @@ begin
     )
     port map (
       clk       => clk,
-      rst       => n_rst,
+      rst       => rst,
       load      => init_load,
       load_data => selector_LFSR_data_in_r,
       gen_e     => enb_gen_r,
@@ -314,7 +307,7 @@ begin
       )
       port map (
         clk       => clk,
-        rst       => n_rst,
+        rst       => rst,
         load      => init_load,
         load_data => LFSR_RAND_in_arr(rand_lfsr),
         gen_e     => RAND_LFSR_en_vector(rand_lfsr),
