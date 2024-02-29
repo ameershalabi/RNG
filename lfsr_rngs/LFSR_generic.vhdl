@@ -1,19 +1,19 @@
 --------------------------------------------------------------------------------
--- Title       : A generic LFSR with asynch load
--- Project     : amshal_misc package
+-- Title       : A generic LFSR with synch load
+-- Project     : hdl_rand
 --------------------------------------------------------------------------------
--- File        : LFSR_generic.vhdl.vhdl
+-- File        : LFSR_generic.vhdl
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Wed Nov 11 08:47:34 2020
--- Last update : Thu Feb 29 09:41:57 2024
+-- Last update : Thu Feb 29 12:24:49 2024
 -- Platform    : -
--- Standard    : <VHDL-2008 | VHDL-2002 | VHDL-1993 | VHDL-1987>
---------------------------------------------------------------------------------
+-- Standard    : <VHDL-2008>
 -------------------------------------------------------------------------------
--- Description: A generic LFSR register with asynch load
--- Resgister is initiated using a vector imported from the amshal_misc package 
+-- Description: 
 --------------------------------------------------------------------------------
+-- Revisions:  
+-------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -32,7 +32,9 @@ entity LFSR_generic is
 end entity LFSR_generic;
 
 architecture LFSR_generic_arch of LFSR_generic is
-constant XOR_placment_ROM : XOR_placment_Type := (
+	type XOR_placment_Type is array(2 to 32) of std_logic_vector(31 downto 0);
+
+	constant XOR_placment_ROM : XOR_placment_Type := (
 			"00000000000000000000000000000011",
 			"00000000000000000000000000000101",
 			"00000000000000000000000000001001",
@@ -67,8 +69,8 @@ constant XOR_placment_ROM : XOR_placment_Type := (
 		);
 	constant XOR_placment : std_logic_vector(LFSR_len-1 downto 0) := XOR_placment_ROM(LFSR_len)(LFSR_len-1 downto 0);
 
-	signal LFSR_Reg       : std_logic_vector(LFSR_len-1 downto 0);
-	signal LFSR_feed      : std_logic;
+	signal LFSR_Reg  : std_logic_vector(LFSR_len-1 downto 0);
+	signal LFSR_feed : std_logic;
 
 begin
 

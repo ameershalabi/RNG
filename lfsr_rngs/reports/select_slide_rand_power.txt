@@ -1,7 +1,13 @@
+Command: report_power
+Running Vector-less Activity Propagation...
+
+Finished Running Vector-less Activity Propagation
+WARNING: [Power 33-332] Found switching activity that implies high-fanout reset nets being asserted for excessive periods of time which may result in inaccurate power analysis.
+Resolution: To review and fix problems, please run Power Constraints Advisor in the GUI from Tools > Power Constraints Advisor or run report_power with the -advisory option to generate a text report.
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2023.2 (win64) Build 4029153 Fri Oct 13 20:14:34 MDT 2023
-| Date             : Wed Feb 28 18:48:21 2024
+| Date             : Thu Feb 29 13:08:40 2024
 | Host             : Maindesktop running 64-bit major release  (build 9200)
 | Command          : report_power
 | Design           : design_1_wrapper
@@ -151,3 +157,7 @@ Table of Contents
 |     select_slide_rand_0 |     0.003 |
 |       U0                |     0.003 |
 +-------------------------+-----------+
+
+
+0 Infos, 1 Warnings, 0 Critical Warnings and 0 Errors encountered.
+report_power completed successfully

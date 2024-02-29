@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2023.2 (win64) Build 4029153 Fri Oct 13 20:14:34 MDT 2023
-| Date         : Wed Feb 28 18:47:25 2024
+| Date         : Thu Feb 29 13:07:22 2024
 | Host         : Maindesktop running 64-bit major release  (build 9200)
 | Command      : report_utilization
 | Design       : design_1_wrapper
@@ -221,3 +221,5 @@ Table of Contents
 | design_1_rst_clk_wiz_100M_0    |    1 |
 | design_1_clk_wiz_0             |    1 |
 +--------------------------------+------+
+
+
