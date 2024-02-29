@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Tue Feb 1  19:38:26 2024
--- Last update : Wed Feb 28 19:04:15 2024
+-- Last update : Thu Feb 29 09:39:48 2024
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 -------------------------------------------------------------------------------
@@ -19,9 +19,6 @@ library IEEE;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
-
-library work;
-use work.amshal_misc_pkg.all;
 
 entity select_slide_rand is
     generic(
@@ -181,7 +178,7 @@ begin
                         selector_LFSR_data_in_r <= init_data_r;
 
                         -- set data for first and last RAND_LFSR
-                        LFSR_RAND_in_arr(0)              <= not init_data_r;
+                        LFSR_RAND_in_arr(0)               <= not init_data_r;
                         LFSR_RAND_in_arr(2**w_slider_c-1) <= init_data_r;
 
                         w_2_init_03_done_r <= '1';

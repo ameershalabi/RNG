@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Tue Feb 11 10:37:34 2024
--- Last update : Tue Feb 13 19:05:44 2024
+-- Last update : Thu Feb 29 09:40:00 2024
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 --------------------------------------------------------------------------------
@@ -19,9 +19,6 @@ library IEEE;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
-
-library work;
-use work.amshal_misc_pkg.all;
 
 entity bit_select_rand is
   generic(
