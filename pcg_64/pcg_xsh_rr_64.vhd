@@ -1,12 +1,12 @@
 --------------------------------------------------------------------------------
--- Title       : Permuted Congruential Generator
+-- Title       : Permuted Congruential Generator (XSH-RR)
 -- Project     : Default Project Name
 --------------------------------------------------------------------------------
 -- File        : pcg_xsh_rr_64.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Sat Feb 24 19:00:58 2024
--- Last update : Sun Mar 10 13:18:10 2024
+-- Last update : Sun Mar 10 17:38:52 2024
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -65,20 +65,6 @@ architecture arch of pcg_xsh_rr_64 is
   signal left_shfts_r  : integer range 0 to 31;
   signal gen_stage_2_r : unsigned(63 downto 0);
   signal gen_word_r    : unsigned(31 downto 0);
-
-  -- use for debug only
-  --signal STAGES_stage_0_r                  : unsigned(63 downto 0);
-  --signal STAGES_stage_0_18_r_shfts_r       : unsigned(63 downto 0);
-  --signal STAGES_stage_0_59_r_shfts_r       : unsigned(63 downto 0);
-  --signal STAGES_stage_1_r                  : unsigned(63 downto 0);
-  --signal STAGES_stage_2_r                  : unsigned(63 downto 0);
-  --signal STAGES_stage_2_rot_r_r            : unsigned(63 downto 0);
-  --signal STAGES_stage_2_rot_l_r            : unsigned(63 downto 0);
-  --signal STAGES_right_shfts_2scomplement_r : std_logic_vector(5 downto 0);
-  --signal STAGES_left_shfts_r               : integer range 0 to 31;
-  --signal STAGES_right_shfts_r              : integer range 0 to 31;
-  --signal STAGES_state_mult_add_r           : unsigned(127 downto 0);
-
 
 begin
 
@@ -158,10 +144,9 @@ begin
     variable gen_word_v    : unsigned(63 downto 0);
 
 
-    -- to hold the larger multiplication and addition result of
+    -- to hold the larger addition result of
     -- state before trancating
-    variable state_mult_v : unsigned(127 downto 0);
-    variable state_add_v  : unsigned(127 downto 0);
+    variable state_add_v : unsigned(127 downto 0);
 
 
   begin
@@ -177,7 +162,7 @@ begin
 
       gen_word_r <= (others => '0');
 
-
+      state_mult_r <= (others => '0');
     elsif rising_edge(clk) then
       if (enb_r = '1') then
         if (seeded_r = '1') then
@@ -202,7 +187,7 @@ begin
           -- perform the first xor operation
           stage_1_v := stage_0_v xor stage_0_18_l_shfts_v;
           -- trancate by 27 
-          stage_2_v := "00000000000000000000000000"&stage_1_v(63 downto 27);
+          stage_2_v := "000000000000000000000000000"&stage_1_v(63 downto 27);
           -- create 2s complement of the right shifts. additiona bit is added to hold
           -- the resulting sign from converting to signed.   
           right_shfts_2scomplement_v := std_logic_vector(unsigned(not(std_logic_vector(to_signed(right_shfts_v,6))))+1);
@@ -210,8 +195,7 @@ begin
           -- 2s complement (with ommiting the sign bit) ANDed with 31 ("11111")
           left_shfts_v := to_integer(unsigned(right_shfts_2scomplement_v and right_shfts_31_signed_v));
           -- end gen_stage_1 by storing variables to registers
-          state_mult_r <= state_r * unsigned(mult_r);
-          --state_mult_r  <= state_mult_v;
+          state_mult_r  <= state_r * unsigned(mult_r);
           gen_stage_2_r <= stage_2_v;
           right_shfts_r <= right_shfts_v;
           left_shfts_r  <= left_shfts_v; --to_integer(unsigned(right_shfts_2scomplement_v(4 downto 0)));
@@ -225,7 +209,7 @@ begin
         if (gen_2_r = '1') then
           stage_2_rot_r_v := shift_right(gen_stage_2_r,right_shfts_r);
           stage_2_rot_l_v := shift_left(gen_stage_2_r,left_shfts_r);
-          state_add_v     := state_mult_v + unsigned(incr_r);
+          state_add_v     := state_mult_r + unsigned(incr_r);
           if (reseed_r = '1') then
             state_r <= unsigned(state_add_v(63 downto 0));
           end if;
@@ -234,18 +218,7 @@ begin
           gen_1_r    <= '1';
           gen_2_r    <= '0';
         end if;
-        -- use for debug only
-        --STAGES_stage_0_r                  <= stage_0_v;
-        --STAGES_stage_0_18_r_shfts_r       <= stage_0_18_l_shfts_v;
-        --STAGES_stage_0_59_r_shfts_r       <= stage_0_59_r_shfts_v;
-        --STAGES_stage_1_r                  <= stage_1_v;
-        --STAGES_stage_2_r                  <= stage_2_v;
-        --STAGES_stage_2_rot_r_r            <= stage_2_rot_r_v;
-        --STAGES_stage_2_rot_l_r            <= stage_2_rot_l_v;
-        --STAGES_right_shfts_2scomplement_r <= right_shfts_2scomplement_v;
-        --STAGES_left_shfts_r               <= left_shfts_v;
-        --STAGES_right_shfts_r              <= right_shfts_v;
-        --STAGES_state_mult_add_r           <= state_mult_add_v;
+
         if (clr_r = '1') then
 
           right_shfts_r <= 0;
@@ -257,6 +230,9 @@ begin
           gen_2_r <= '0';
 
           gen_word_r <= (others => '0');
+
+          state_mult_r <= (others => '0');
+
 
         end if; -- clr_r = '1'
       end if;   -- enb_r = '1'
