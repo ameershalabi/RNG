@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 -- Title       : Permuted Congruential Generator (XSH-RR)
--- Project     : Default Project Name
+-- Project     : hdl_rand
 --------------------------------------------------------------------------------
 -- File        : pcg_xsh_rr_64.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Sat Feb 24 19:00:58 2024
--- Last update : Sun Mar 10 17:38:52 2024
+-- Last update : Wed Mar 13 17:21:46 2024
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
--- Description: A PCG of type : PCG-XSH-RR
+-- Description: A PCG of type : PCG-XSH-RR - 64b to 32b
 -- It uses an XORshift function to mix the highest MSBs of the state while using 
 -- the 5 MSBs to determine the rotate amount of bits 27 to 58
 --------------------------------------------------------------------------------
@@ -176,6 +176,7 @@ begin
         if (gen_1_r = '1' and seeded_r = '0') then
           -- get current state
           stage_0_v := state_r;
+          state_mult_r  <= state_r * unsigned(mult_r);
           -- trancate the state value instead of shifting
           stage_0_18_l_shfts_v := stage_0_v(63-18 downto 0)&"000000000000000000";
           --stage_0_18_l_shfts_v := (63 downto 64-18 => '0')&stage_0_v(63-18 downto 0);
@@ -188,14 +189,13 @@ begin
           stage_1_v := stage_0_v xor stage_0_18_l_shfts_v;
           -- trancate by 27 
           stage_2_v := "000000000000000000000000000"&stage_1_v(63 downto 27);
-          -- create 2s complement of the right shifts. additiona bit is added to hold
-          -- the resulting sign from converting to signed.   
+          -- create 2s complement of the right shifts and left shift of the rotating function
+          -- additional bit is added to hold the resulting sign from converting to signed.   
           right_shfts_2scomplement_v := std_logic_vector(unsigned(not(std_logic_vector(to_signed(right_shfts_v,6))))+1);
           right_shfts_31_signed_v    := std_logic_vector(to_signed(31,6));
           -- 2s complement (with ommiting the sign bit) ANDed with 31 ("11111")
           left_shfts_v := to_integer(unsigned(right_shfts_2scomplement_v and right_shfts_31_signed_v));
           -- end gen_stage_1 by storing variables to registers
-          state_mult_r  <= state_r * unsigned(mult_r);
           gen_stage_2_r <= stage_2_v;
           right_shfts_r <= right_shfts_v;
           left_shfts_r  <= left_shfts_v; --to_integer(unsigned(right_shfts_2scomplement_v(4 downto 0)));

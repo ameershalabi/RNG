@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : User Company Name
 -- Created     : Mon Mar 10 13:43:15 2024
--- Last update : Mon Mar 11 16:06:42 2024
+-- Last update : Wed Mar 13 15:06:38 2024
 -- Platform    : -
 -- Standard    : VHDL-2008
 -------------------------------------------------------------------------------
@@ -70,6 +70,7 @@ architecture arch of pcg_xsl_rr_128 is
   signal left_128_shfts_r  : integer range 0 to 63;
   signal gen_128_stage_2_r : unsigned(127 downto 0);
   signal gen_128_word_r    : unsigned(63 downto 0);
+
 
 begin
 
