@@ -1,0 +1,7 @@
+Follwoing clock frequency used to synthasize the different RNG blocks with no negative slack: 
+bit_select_rand -- 100MHz
+select_slide_rand -- 100MHz
+pcg_rxs_m_xs_32 -- 77.76MHz
+pcg_xsh_rr_64 -- 77.76MHz
+pcg_xsl_rr_128 -- 36.864MHz
+mt -- 36.864MHz

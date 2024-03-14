@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
 -- Title       : Mersenne Twister
--- Project     : rand_proj
+-- Project     : hdl_rand
 --------------------------------------------------------------------------------
 -- File        : mt_32.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Mon Feb 19 18:57:40 2024
--- Last update : Wed Feb 28 19:18:02 2024
+-- Last update : Thu Mar 14 18:53:58 2024
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 --------------------------------------------------------------------------------
--- Description: 
+-- Description: A Mersenne Twister hardware implementation
 --------------------------------------------------------------------------------
 -- Revisions:
 -------------------------------------------------------------------------------
@@ -139,17 +139,7 @@ architecture mt_32_arch of mt_32 is
   signal twist_r                   : std_logic;
   signal twist_counter_r           : integer range 0 to n_reccurance_c;
   signal twisted_word_r            : unsigned(31 downto 0);
-  signal TWIST_twist_word          : unsigned(31 downto 0);
-  signal TWIST_up_twist_word       : unsigned(31 downto 0);
-  signal TWIST_lo_twist_word       : unsigned(31 downto 0);
-  signal TWIST_up_mask_and_word    : unsigned(31 downto 0);
-  signal TWIST_lo_mask_and_word    : unsigned(31 downto 0);
-  signal TWIST_masked_word         : unsigned(31 downto 0);
-  signal TWIST_shifted_masked_word : unsigned(31 downto 0);
-  signal TWIST_twisted_word        : unsigned(31 downto 0);
-  signal TWIST_i_1_mod_n           : integer range 0 to n_reccurance_c+m_middle_word_c-1;
-  signal TWIST_i_m_mod_n           : integer range 0 to n_reccurance_c+m_middle_word_c-1;
-
+ 
   --generate control signals
   signal gen_r         : std_logic;
   signal gen_counter_r : integer range 0 to n_reccurance_c;
@@ -218,7 +208,6 @@ begin
     variable shifted_word_v   : unsigned(31 downto 0);
     variable xor_stage_v      : unsigned(31 downto 0);
     variable mult_add_stage_v : unsigned(63 downto 0);
-    variable add_stage_v : unsigned(31 downto 0);
   begin
     if (rst = '0') then
       init_mt_arr_r      <= (others => (others => '0'));
@@ -238,7 +227,6 @@ begin
 
           init_in_progress_r <= '1'; -- mark init in progress
           init_done_r        <= '0'; -- not done yet
-                                     --start_twist_r      <= '0';
 
           if init_in_progress_r = '1' then --and init_counter_r < n_reccurance_c then
                                            -- get the previous word from the tm array
@@ -248,11 +236,9 @@ begin
             -- init_word_v XOR shifted_word_v
             xor_stage_v := init_word_v xor shifted_word_v;
             -- multiply with f_mult_factor_c and add location in tm array
-            add_stage_v := xor_stage_v + to_unsigned(init_counter_r,32);
-            --mult_add_stage_v :=unsigned(f_mult_factor_c) * xor_stage_v + to_unsigned(init_counter_r,32);
+            mult_add_stage_v :=unsigned(f_mult_factor_c) * xor_stage_v + to_unsigned(init_counter_r,32);
             -- get the w_data_width_c msb of the multiplication result
-            init_mt_arr_r(init_counter_r) <= add_stage_v(31 downto 0);
-            --init_mt_arr_r(init_counter_r) <= mult_add_stage_v(31 downto 0);
+            init_mt_arr_r(init_counter_r) <= mult_add_stage_v(31 downto 0);
             -- increment counter to fetch new word
             init_counter_r <= init_counter_r +1;
 
@@ -342,20 +328,6 @@ begin
             -- word result of twisting
             twisted_word_v := shifted_masked_word_v xor mt_arr_r(i_m_mod_n_v);
 
-            TWIST_twist_word          <= twist_word_v;
-            TWIST_up_twist_word       <= up_twist_word_v;
-            TWIST_i_1_mod_n           <= i_1_mod_n_v;
-            TWIST_lo_twist_word       <= lo_twist_word_v;
-            TWIST_up_mask_and_word    <= up_mask_and_word_v;
-            TWIST_lo_mask_and_word    <= lo_mask_and_word_v;
-            TWIST_masked_word         <= masked_word_v;
-            TWIST_shifted_masked_word <= shifted_masked_word_v;
-            TWIST_twisted_word        <= twisted_word_v;
-            TWIST_i_m_mod_n           <= i_m_mod_n_v;
-
-            -- fill the debugging twist_mt_arr_r
-            --twist_mt_arr_r(twist_counter_r) <= twisted_word_v;
-            
             -- store twisted word 
             twisted_word_r                  <= twisted_word_v;
 
