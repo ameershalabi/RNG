@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Tue Feb 11 10:37:34 2024
--- Last update : Thu Feb 29 22:33:47 2024
+-- Last update : Thu Mar 14 23:48:30 2024
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 --------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ entity bit_select_rand is
 
 end entity bit_select_rand;
 
-architecture bit_select_rand_arch of bit_select_rand is
+architecture arch of bit_select_rand is
 
   function get_RAND_LFSRs_width return integer is
     variable w_RAND_LFSRs : integer range 1 to 32;
@@ -289,7 +289,12 @@ begin
       if (enb_r = '1') then
         if enb_gen_r = '1' then
           en_gen_vector : for en_bit in 0 to 2**n_select_bits_g-1 loop
-            RAND_LFSR_en_vector(en_bit) <= (output_rand_o_r(2**n_select_bits_g-1-en_bit) nand enb_gen_r);
+            if RAND_LFSR_en_vector(en_bit) = '0' then
+              RAND_LFSR_en_vector(en_bit) <= (output_rand_o_r(en_bit) or init_data_r(2**n_select_bits_g-1-en_bit));
+            else
+              RAND_LFSR_en_vector(en_bit) <= (output_rand_o_r(en_bit) nand init_data_r(2**n_select_bits_g-1-en_bit));
+            end if;
+            --RAND_LFSR_en_vector(en_bit) <= (output_rand_o_r(2**n_select_bits_g-1-en_bit) xor RAND_LFSR_en_vector(en_bit));
           end loop en_gen_vector;
         end if;
 
@@ -335,4 +340,4 @@ begin
   init_done_o   <= init_done_r;
   output_rand_o <= output_rand_o_r;
 
-end bit_select_rand_arch;
+end arch;
