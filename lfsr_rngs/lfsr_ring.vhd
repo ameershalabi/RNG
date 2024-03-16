@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Fri Mar 15 21:55:02 2024
--- Last update : Sat Mar 16 13:33:05 2024
+-- Last update : Sat Mar 16 17:58:25 2024
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -207,7 +207,7 @@ begin
             LFSR_ring_arr(3) <= LFSR_RAND_out_arr(1);
             ring_indic_r     <= x"1";
 
-          else
+          elsif ring_indic_r = x"1" then
             LFSR_ring_arr(3) <= LFSR_RAND_out_arr(0);
             ring_indic_r     <= x"8";
           end if ;
@@ -226,7 +226,7 @@ begin
   end process lfsr_ring_proc;
 
   -- generate the enable for the selector LFSR
-  out_gen_proc : process (LFSR_RAND_out_arr)
+  out_gen_proc : process (LFSR_ring_arr)
     variable lfsr_0 : std_logic_vector(w_LFSR_c-1 downto 0);
     variable lfsr_1 : std_logic_vector(w_LFSR_c-1 downto 0);
     variable lfsr_2 : std_logic_vector(w_LFSR_c-1 downto 0);
@@ -239,29 +239,29 @@ begin
     variable nand_check : std_logic_vector(3 downto 0);
 
   begin
-    lfsr_0 := LFSR_RAND_out_arr(0);
-    lfsr_1 := LFSR_RAND_out_arr(1);
-    lfsr_2 := LFSR_RAND_out_arr(2);
-    lfsr_3 := LFSR_RAND_out_arr(3);
+    lfsr_0 := LFSR_ring_arr(0);
+    lfsr_1 := LFSR_ring_arr(1);
+    lfsr_2 := LFSR_ring_arr(2);
+    lfsr_3 := LFSR_ring_arr(3);
     gen_output : for lfsr_bit in 0 to w_LFSR_c-1 loop
       cxord                   := lfsr_2(w_LFSR_c-1-lfsr_bit) xor lfsr_3(lfsr_bit);
       output_vector(lfsr_bit) <= lfsr_3(lfsr_bit);
       if cxord = '1' then
         output_vector(lfsr_bit) <= lfsr_0(lfsr_bit) xor not (lfsr_1(lfsr_bit) or lfsr_2(lfsr_bit));
-
-        indic_0 := lfsr_0(w_LFSR_c-1-lfsr_bit)
-          & lfsr_1(w_LFSR_c-1-lfsr_bit)
-          & lfsr_2(w_LFSR_c-1-lfsr_bit)
-          & lfsr_3(w_LFSR_c-1-lfsr_bit);
       else
         output_vector(lfsr_bit) <= lfsr_2(lfsr_bit) xor not (lfsr_1(lfsr_bit) or lfsr_3(lfsr_bit));
-
-        indic_1 := lfsr_0(lfsr_bit)
-          & lfsr_1(lfsr_bit)
-          & lfsr_2(lfsr_bit)
-          & lfsr_3(lfsr_bit);
-
       end if;
+
+      indic_0 := lfsr_0(w_LFSR_c-1-lfsr_bit)
+        & lfsr_1(w_LFSR_c-1-lfsr_bit)
+        & lfsr_2(w_LFSR_c-1-lfsr_bit)
+        & lfsr_3(w_LFSR_c-1-lfsr_bit);
+
+      indic_1 := lfsr_0(lfsr_bit)
+        & lfsr_1(lfsr_bit)
+        & lfsr_2(lfsr_bit)
+        & lfsr_3(lfsr_bit);
+
     end loop gen_output;
     nand_check := indic_1 nand indic_0;
     if nand_check = x"0" then
