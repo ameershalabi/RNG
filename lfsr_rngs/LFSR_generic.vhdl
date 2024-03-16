@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Wed Nov 11 08:47:34 2020
--- Last update : Thu Feb 29 12:24:49 2024
+-- Last update : Sat Mar 16 17:52:24 2024
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 -------------------------------------------------------------------------------
@@ -78,6 +78,7 @@ begin
 	begin
 		if (rst='0') then
 			LFSR_Reg <= XOR_placment;
+			LFSR_feed <= '0';
 		elsif rising_edge(clk) then
 			LFSR_feed <= '0';
 			if load = '1' then
