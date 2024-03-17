@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : 
 -- Created     : Sun Mar 17 09:20:44 2024
--- Last update : Sun Mar 17 10:40:43 2024
+-- Last update : Sun Mar 17 13:14:06 2024
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -54,7 +54,11 @@ architecture arch of pcg_xsh_rs_64 is
 
   -- gen signals
   signal state_r       : unsigned(63 downto 0);
-  signal gen_r       : std_logic;
+  signal gen_1_r       : std_logic;
+  signal gen_2_r       : std_logic;
+  signal stage_1_r     : unsigned(63 downto 0);
+  signal right_shfts_r : integer range 0 to 31;
+  signal state_mult_r  : unsigned(63 downto 0);
   signal gen_word_r    : unsigned(31 downto 0);
 
 begin
@@ -117,7 +121,7 @@ begin
     variable stage_0_61_r_shfts_v : unsigned(2 downto 0);
     -- stage_1 is thge result of XOR op between stage_0
     -- and shifted stage_0 by 22
-    variable stage_1_v : unsigned(63 downto 0);
+    variable stage_1_v     : unsigned(63 downto 0);
     variable right_shfts_v : integer range 0 to 31;
 
     variable gen_word_v : unsigned(63 downto 0);
@@ -128,21 +132,26 @@ begin
     if (rst = '0') then
 
       state_r <= (others => '0');
-      gen_r <= '0';
+      gen_1_r <= '0';
+      gen_2_r <= '0';
 
-      gen_word_r <= (others => '0');
+      state_mult_r  <= (others => '0');
+      stage_1_r     <= (others => '0');
+      right_shfts_r <= 0;
+      gen_word_r    <= (others => '0');
 
     elsif rising_edge(clk) then
       if (enb_r = '1') then
         if (seeded_r = '1') then
           seed_v  := (2 * unsigned(seed_r)) + 1;
           state_r <= seed_v(63 downto 0);
-          gen_r <= '1';
+          gen_1_r <= '1';
+          gen_2_r <= '0';
         end if;
         -----------------------------------------------------------------------
         -- Gen Stage 1
         -----------------------------------------------------------------------
-        if (gen_r = '1' and seeded_r = '0') then
+        if (gen_1_r = '1' and seeded_r = '0') then
           -- get current state
           stage_0_v    := state_r;
           state_mult_v := state_r * unsigned(mult_r);
@@ -154,18 +163,35 @@ begin
           -- perform the first xor operation
           stage_1_v := stage_0_v xor stage_0_22_r_shfts_v;
           -- end gen_stage_1 by storing variables to registers
-          gen_word_v := shift_right(stage_1_v,right_shfts_v);
+          state_mult_r  <= unsigned(state_mult_v(63 downto 0));
+          stage_1_r     <= stage_1_v;
+          right_shfts_r <= right_shfts_v;
+
+          gen_1_r       <= '0';
+          gen_2_r       <= '1';
+
+        end if;
+
+        if (gen_2_r = '1') then
+          gen_word_v := shift_right(stage_1_r,right_shfts_r);
           if (reseed_r = '1') then
-            state_r <= unsigned(state_mult_v(63 downto 0));
+            state_r <= state_mult_r;
           end if;
           gen_word_r <= gen_word_v(31 downto 0);
+          
+          gen_1_r    <= '1';
+          gen_2_r    <= '0';
         end if;
 
         if (clr_r = '1') then
           state_r <= (others => '0');
-          gen_r <= '0';
+          gen_1_r <= '0';
+          gen_2_r <= '0';
 
-          gen_word_r <= (others => '0');
+          state_mult_r  <= (others => '0');
+          stage_1_r     <= (others => '0');
+          right_shfts_r <= 0;
+          gen_word_r    <= (others => '0');
 
 
         end if; -- clr_r = '1'
