@@ -1,26 +1,28 @@
 --------------------------------------------------------------------------------
--- Title       : Permuted Congruential Generator
--- Project     : Default Project Name
+-- Title       : Permuted Congruential Generator (XSH-RR)
+-- Project     : hdl_rand
 --------------------------------------------------------------------------------
--- File        : pcg_64.vhd
+-- File        : pcg_xsh_rr_64.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Sat Feb 24 19:00:58 2024
--- Last update : Tue Feb 27 15:12:41 2024
+-- Last update : Wed Mar 13 17:21:46 2024
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
--- Description: 
+-- Description: A PCG of type : PCG-XSH-RR - 64b to 32b
+-- It uses an XORshift function to mix the highest MSBs of the state while using 
+-- the 5 MSBs to determine the rotate amount of bits 27 to 58
 --------------------------------------------------------------------------------
 -- Revisions:  
 -------------------------------------------------------------------------------
 
-library IEEE;
+library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-entity pcg_64 is
+entity pcg_xsh_rr_64 is
   port (
     -- ctrl ports
     clk : in std_logic; -- clock pin
@@ -35,13 +37,13 @@ entity pcg_64 is
     incr_i   : in std_logic_vector(63 downto 0);
     reseed_i : in std_logic;
 
-    init_done_o : out std_logic;
-    pcg_64_o    : out std_logic_vector(31 downto 0)
+    init_done_o     : out std_logic;
+    pcg_xsh_rr_64_o : out std_logic_vector(31 downto 0)
   );
 
-end entity pcg_64;
+end entity pcg_xsh_rr_64;
 
-architecture arch of pcg_64 is
+architecture arch of pcg_xsh_rr_64 is
 
   signal clr_r    : std_logic;
   signal enb_r    : std_logic;
@@ -63,20 +65,6 @@ architecture arch of pcg_64 is
   signal left_shfts_r  : integer range 0 to 31;
   signal gen_stage_2_r : unsigned(63 downto 0);
   signal gen_word_r    : unsigned(31 downto 0);
-
-  -- use for debug only
-  --signal STAGES_stage_0_r                  : unsigned(63 downto 0);
-  --signal STAGES_stage_0_18_r_shfts_r       : unsigned(63 downto 0);
-  --signal STAGES_stage_0_59_r_shfts_r       : unsigned(63 downto 0);
-  --signal STAGES_stage_1_r                  : unsigned(63 downto 0);
-  --signal STAGES_stage_2_r                  : unsigned(63 downto 0);
-  --signal STAGES_stage_2_rot_r_r            : unsigned(63 downto 0);
-  --signal STAGES_stage_2_rot_l_r            : unsigned(63 downto 0);
-  --signal STAGES_right_shfts_2scomplement_r : std_logic_vector(5 downto 0);
-  --signal STAGES_left_shfts_r               : integer range 0 to 31;
-  --signal STAGES_right_shfts_r              : integer range 0 to 31;
-  --signal STAGES_state_mult_add_r           : unsigned(127 downto 0);
-
 
 begin
 
@@ -136,7 +124,7 @@ begin
     -- integerthe shifting logic is not needed. 
     -- instead, the unsinged bit vector is trancated.
     variable stage_0_18_l_shfts_v : unsigned(63 downto 0);
-    variable stage_0_59_r_shfts_v : unsigned(63 downto 0);
+    variable stage_0_59_r_shfts_v : unsigned(4 downto 0);
     -- stage_1 is thge result of XOR op between stage_0
     -- and shifted stage_0 by 18
     variable stage_1_v : unsigned(63 downto 0);
@@ -156,10 +144,9 @@ begin
     variable gen_word_v    : unsigned(63 downto 0);
 
 
-    -- to hold the larger multiplication and addition result of
+    -- to hold the larger addition result of
     -- state before trancating
-    variable state_mult_v : unsigned(127 downto 0);
-    variable state_add_v  : unsigned(127 downto 0);
+    variable state_add_v : unsigned(127 downto 0);
 
 
   begin
@@ -175,7 +162,7 @@ begin
 
       gen_word_r <= (others => '0');
 
-
+      state_mult_r <= (others => '0');
     elsif rising_edge(clk) then
       if (enb_r = '1') then
         if (seeded_r = '1') then
@@ -189,27 +176,26 @@ begin
         if (gen_1_r = '1' and seeded_r = '0') then
           -- get current state
           stage_0_v := state_r;
+          state_mult_r  <= state_r * unsigned(mult_r);
           -- trancate the state value instead of shifting
-          stage_0_18_l_shfts_v := stage_0_v(63-18 downto 0)&(18-1 downto 0 => '0');
+          stage_0_18_l_shfts_v := stage_0_v(63-18 downto 0)&"000000000000000000";
           --stage_0_18_l_shfts_v := (63 downto 64-18 => '0')&stage_0_v(63-18 downto 0);
-          stage_0_59_r_shfts_v := (63 downto 64-59 => '0')&stage_0_v(63 downto 59);
+          stage_0_59_r_shfts_v := stage_0_v(63 downto 59);
           -- stage_0_59_r_shfts will have only 5 bits with actual
           -- stored value after shifting, so right shift only needs to
           -- hold the value of those 5 bits
-          right_shfts_v := to_integer(stage_0_59_r_shfts_v(4 downto 0));
+          right_shfts_v := to_integer(stage_0_59_r_shfts_v);
           -- perform the first xor operation
           stage_1_v := stage_0_v xor stage_0_18_l_shfts_v;
           -- trancate by 27 
-          stage_2_v := (63 downto 64-27 => '0')&stage_1_v(63 downto 27);
-          -- create 2s complement of the right shifts. additiona bit is added to hold
-          -- the resulting sign from converting to signed.   
+          stage_2_v := "000000000000000000000000000"&stage_1_v(63 downto 27);
+          -- create 2s complement of the right shifts and left shift of the rotating function
+          -- additional bit is added to hold the resulting sign from converting to signed.   
           right_shfts_2scomplement_v := std_logic_vector(unsigned(not(std_logic_vector(to_signed(right_shfts_v,6))))+1);
           right_shfts_31_signed_v    := std_logic_vector(to_signed(31,6));
           -- 2s complement (with ommiting the sign bit) ANDed with 31 ("11111")
           left_shfts_v := to_integer(unsigned(right_shfts_2scomplement_v and right_shfts_31_signed_v));
           -- end gen_stage_1 by storing variables to registers
-          state_mult_r  <= state_r * unsigned(mult_r);
-          --state_mult_r  <= state_mult_v;
           gen_stage_2_r <= stage_2_v;
           right_shfts_r <= right_shfts_v;
           left_shfts_r  <= left_shfts_v; --to_integer(unsigned(right_shfts_2scomplement_v(4 downto 0)));
@@ -223,7 +209,7 @@ begin
         if (gen_2_r = '1') then
           stage_2_rot_r_v := shift_right(gen_stage_2_r,right_shfts_r);
           stage_2_rot_l_v := shift_left(gen_stage_2_r,left_shfts_r);
-          state_add_v     := state_mult_v + unsigned(incr_r);
+          state_add_v     := state_mult_r + unsigned(incr_r);
           if (reseed_r = '1') then
             state_r <= unsigned(state_add_v(63 downto 0));
           end if;
@@ -232,18 +218,7 @@ begin
           gen_1_r    <= '1';
           gen_2_r    <= '0';
         end if;
-        -- use for debug only
-        --STAGES_stage_0_r                  <= stage_0_v;
-        --STAGES_stage_0_18_r_shfts_r       <= stage_0_18_l_shfts_v;
-        --STAGES_stage_0_59_r_shfts_r       <= stage_0_59_r_shfts_v;
-        --STAGES_stage_1_r                  <= stage_1_v;
-        --STAGES_stage_2_r                  <= stage_2_v;
-        --STAGES_stage_2_rot_r_r            <= stage_2_rot_r_v;
-        --STAGES_stage_2_rot_l_r            <= stage_2_rot_l_v;
-        --STAGES_right_shfts_2scomplement_r <= right_shfts_2scomplement_v;
-        --STAGES_left_shfts_r               <= left_shfts_v;
-        --STAGES_right_shfts_r              <= right_shfts_v;
-        --STAGES_state_mult_add_r           <= state_mult_add_v;
+
         if (clr_r = '1') then
 
           right_shfts_r <= 0;
@@ -256,13 +231,16 @@ begin
 
           gen_word_r <= (others => '0');
 
+          state_mult_r <= (others => '0');
+
+
         end if; -- clr_r = '1'
       end if;   -- enb_r = '1'
     end if;
   end process gen_proc;
 
-  init_done_o <= seeded_r;
-  pcg_64_o    <= std_logic_vector(gen_word_r);
+  init_done_o     <= seeded_r;
+  pcg_xsh_rr_64_o <= std_logic_vector(gen_word_r);
 
 
 end architecture arch;
