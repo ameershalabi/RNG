@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Tue Feb 11 10:37:34 2024
--- Last update : Thu Mar 14 23:48:30 2024
+-- Last update : Sun Apr 13 13:51:48 2025
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 --------------------------------------------------------------------------------
@@ -19,6 +19,8 @@ library IEEE;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
+
+library rng;
 
 entity bit_select_rand is
   generic(
@@ -263,7 +265,7 @@ begin
 
 
 
-  i_selector_LFSR : entity work.LFSR_generic
+  i_selector_LFSR : entity rng.LFSR_generic
     generic map (
       LFSR_len => n_select_bits_g
     )
@@ -306,7 +308,7 @@ begin
   end process enb_gen_proc;
 
   RAND_LFSRs_gen : for rand_lfsr in 0 to 2**n_select_bits_g-1 generate
-    i_LFSR_RAND : entity work.LFSR_generic
+    i_LFSR_RAND : entity rng.LFSR_generic
       generic map (
         LFSR_len => w_LFSR_c
       )

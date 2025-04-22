@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Tue Feb 1  19:38:26 2024
--- Last update : Thu Feb 29 09:39:48 2024
+-- Last update : Sun Apr 13 13:51:54 2025
 -- Platform    : -
 -- Standard    : <VHDL-2008>
 -------------------------------------------------------------------------------
@@ -19,6 +19,8 @@ library IEEE;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
+
+library rng;
 
 entity select_slide_rand is
     generic(
@@ -365,7 +367,7 @@ begin
     end process enable_proc;
 
 
-    i_selector_LFSR : entity work.LFSR_generic
+    i_selector_LFSR : entity rng.LFSR_generic
         generic map (
             LFSR_len => w_LFSR_c
         )
@@ -421,7 +423,7 @@ begin
     --end process enable_RAND_proc;
 
     RAND_LFSRs_gen : for rand_lfsr in 0 to 2**w_slider_c-1 generate
-        i_LFSR_RAND : entity work.LFSR_generic
+        i_LFSR_RAND : entity rng.LFSR_generic
             generic map (
                 LFSR_len => w_LFSR_c
             )

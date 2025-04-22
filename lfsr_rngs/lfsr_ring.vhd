@@ -6,7 +6,7 @@
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Company     : -
 -- Created     : Fri Mar 15 21:55:02 2024
--- Last update : Sat Mar 16 17:58:25 2024
+-- Last update : Sun Apr 13 13:51:02 2025
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -20,6 +20,8 @@ library IEEE;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
+
+library rng;
 
 entity lfsr_ring is
   generic(
@@ -166,7 +168,7 @@ begin
   end process enable_proc;
 
   RAND_LFSRs_gen : for rand_lfsr in 0 to 3 generate
-    i_LFSR_RAND : entity work.LFSR_generic
+    i_LFSR_RAND : entity rng.LFSR_generic
       generic map (
         LFSR_len => w_LFSR_c
       )
