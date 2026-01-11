@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------
--- Title       : Cellular Automata Shift Register (CASR) (Rule 150) 
+-- Title       : Cellular Automata Shift Register (CASR) (Rule 90/150 Hybrid) 
 -- Project     : hdl_rand
 --------------------------------------------------------------------------------
--- File        : casr_150.vhd
+-- File        : casr_90150h.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
--- Created     : Sat Jan 10 21:46:02 2026
--- Last update : Sun Jan 11 11:35:25 2026
+-- Created     : Sun Jan 11 10:20:17 2026
+-- Last update : Sun Jan 11 12:23:39 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
--- Description: A Cellular Automata Shift Register (CASR) applying basic
--- rule 150. Has three output modes: 
+-- Description: A Cellular Automata Shift Register (CASR) applying rules 90
+-- and rule 150 selectively. Has three output modes: 
 -- 1) State LSB output (serial LSB)
 -- 2) State MSB output (serial MSB)
 -- 3) Full state output (parallel)
@@ -19,7 +19,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity casr_150 is
+entity casr_90150h is
   generic (
     w_casr_g : integer := 8;
     -- control which bit to output
@@ -29,7 +29,13 @@ entity casr_150 is
     -- mode
     -- '0' : output is serial mode
     -- '1' : output is parallel
-    o_mode_g : std_logic := '0'
+    o_mode_g : std_logic := '0';
+    -- rule vector mode
+    -- '0' : rule vector is static
+    -- stored when seed is loaded
+    -- '1' : rule vector is dynamic
+    -- stored when rule_i chnages
+    r_dyn_g : std_logic := '0'
   );
   port (
     -- ctrl ports
@@ -39,6 +45,7 @@ entity casr_150 is
     enb : in std_logic; -- enable pin
 
     seed_i : in std_logic_vector(w_casr_g-1 downto 0);
+    rule_i : in std_logic_vector(w_casr_g-1 downto 0);
     init_i : in std_logic;
     gen_i  : in std_logic;
 
@@ -47,9 +54,9 @@ entity casr_150 is
 
   );
 
-end entity casr_150;
+end entity casr_90150h;
 
-architecture arch of casr_150 is
+architecture arch of casr_90150h is
 
   signal clr_r  : std_logic;
   signal enb_r  : std_logic;
@@ -59,6 +66,9 @@ architecture arch of casr_150 is
   -- two additional bits are used to connect the 
   -- register ends
   signal ext_casr_r : std_logic_vector(w_casr_g+1 downto 0);
+
+  -- register to store the bit rules
+  signal rule_r : std_logic_vector(w_casr_g-1 downto 0);
 
   -- output bit signals
   signal gen_valid   : std_logic;
@@ -107,6 +117,57 @@ begin
     state_o <= ext_casr_r(w_casr_g downto 1);
   end generate gen_parallel_mode;
 
+  -- when r_dyn_g = '0'
+  -- store rule_i into register only when init_i is
+  -- high. Only a single rule vector can be used for 
+  -- each seed
+  gen_static_rule_vector : if (r_dyn_g = '0') generate
+
+    gen_static_rule_proc : process (clk, rst)
+    begin
+      if (rst = '0') then
+        rule_r <= (others => '0');
+      elsif rising_edge(clk) then
+        if (enb_r = '1') then
+          -- store the rule vector only when init is done
+          if (init_i = '1') then
+            rule_r <= rule_i;
+          end if;
+
+          if (clr_r = '1') then
+            rule_r <= (others => '0');
+          end if;
+
+        end if;
+      end if;
+    end process gen_static_rule_proc;
+
+  end generate gen_static_rule_vector;
+
+  -- when r_dyn_g = '1'
+  -- store rule_i into register at every clock cycle 
+  -- when the block is enabled. multiple rule vectors
+  -- can be used with a single seed
+  gen_dynamic_rule_vector : if (r_dyn_g = '0') generate
+
+    gen_dynamic_rule_proc : process (clk, rst)
+    begin
+      if (rst = '0') then
+        rule_r <= (others => '0');
+      elsif rising_edge(clk) then
+        if (enb_r = '1') then
+          -- store the rule vector at every enabled clock cycle
+          rule_r <= rule_i;
+          if (clr_r = '1') then
+            rule_r <= (others => '0');
+          end if;
+
+        end if;
+      end if;
+    end process gen_dynamic_rule_proc;
+
+  end generate gen_dynamic_rule_vector;
+
 
   ctrl_proc : process (clk, rst)
   begin
@@ -145,7 +206,7 @@ begin
       ext_casr_r  <= (others => '0');
     elsif rising_edge(clk) then
       if (enb_r = '1') then
-        gen_r       <= gen_i;
+        gen_r  <= gen_i;
         -- output is invalid by default
         gen_valid_r <= '0';
 
@@ -176,8 +237,18 @@ begin
               c := ext_casr_r(b);
               -- get right bit of state bit b
               r := ext_casr_r(b+1);
-              --exp1 := l xor r;
-              exp1 := l xor c xor r;
+
+              -- for each bit, check associated rule.
+              -- when rule_r(b-1) = '0', use rule 90
+              -- when rule_r(b-1) = '1', use rule 150
+              if (rule_r(b-1) = '0') then
+                -- generate next bit state using rule 90
+                exp1 := l xor r;
+              else
+                -- generate next bit state using rule 150
+                exp1 := l xor c xor r;
+              end if;
+
               -- store the new state bit
               new_ext_casr_v(b) := exp1;
               -- generate the extention bits for next round

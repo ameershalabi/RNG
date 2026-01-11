@@ -5,7 +5,7 @@
 -- File        : casr_90.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Created     : Sat Jan 10 17:49:02 2026
--- Last update : Sat Jan 10 21:46:13 2026
+-- Last update : Sun Jan 11 11:35:30 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -53,7 +53,6 @@ architecture arch of casr_90 is
 
   signal clr_r  : std_logic;
   signal enb_r  : std_logic;
-  signal init_r : std_logic;
   signal gen_r  : std_logic;
 
   -- extended casr for generating the next state
@@ -140,17 +139,17 @@ begin
 
   begin
     if (rst = '0') then
-      init_r      <= '0';
       gen_r       <= '0';
       gen_valid_r <= '0';
       ext_casr_r  <= (others => '0');
     elsif rising_edge(clk) then
       if (enb_r = '1') then
-        init_r      <= init_i;
         gen_r       <= gen_i;
-        gen_valid_r <= '0'; -- output is invalid by default
-                            -- load the seed when init_i is high
-        if (init_r = '1') then
+        -- output is invalid by default
+        gen_valid_r <= '0';
+
+        -- load the seed when init_i is high
+        if (init_i = '1') then
           ext_casr_r(w_casr_g downto 1) <= seed_i;
           -- connect LSBext to the MSB of state
           ext_casr_r(0) <= seed_i(w_casr_g-1);
@@ -186,8 +185,8 @@ begin
           end if;
         end if;
         if (clr_r = '1') then
-          init_r <= '0';
-          gen_r  <= '0';
+          gen_r       <= '0';
+          gen_valid_r <= '0';
         end if;
       end if;
     end if;
