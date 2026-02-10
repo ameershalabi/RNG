@@ -5,7 +5,7 @@
 -- File        : casr_90150h.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Created     : Sun Jan 11 10:20:17 2026
--- Last update : Tue Feb 10 09:56:44 2026
+-- Last update : Tue Feb 10 15:17:02 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -65,7 +65,8 @@ architecture arch of casr_90150h is
   -- extended casr for generating the next state
   -- two additional bits are used to connect the 
   -- register ends
-  signal ext_casr_r : std_logic_vector(w_casr_g+1 downto 0);
+  signal ext_casr_r   : std_logic_vector(w_casr_g+1 downto 0);
+  signal seed_valid_r : std_logic;
 
   -- register to store the bit rules
   signal rule_r : std_logic_vector(w_casr_g-1 downto 0);
@@ -201,10 +202,11 @@ begin
 
   begin
     if (rst = '0') then
-      gen_r       <= '0';
-      gen_valid_r <= '0';
-      ext_casr_r  <= (others => '0');
-      rule_r      <= (others => '0');
+      gen_r        <= '0';
+      gen_valid_r  <= '0';
+      seed_valid_r <= '0';
+      ext_casr_r   <= (others => '0');
+      rule_r       <= (others => '0');
     elsif rising_edge(clk) then
       if (enb_r = '1') then
         -- output is invalid by default
@@ -220,49 +222,51 @@ begin
           ext_casr_r(w_casr_g+1) <= seed_i(0);
           -- first output after init is invalid as
           -- it is the o_bit of the seed
-          gen_valid_r <= '0';
-          rule_r      <= rule_i;
+          gen_valid_r  <= '0';
+          seed_valid_r <= '0';
+          rule_r       <= rule_i;
 
-        else
-          -- if gen_i is high and init_i is low,
-          -- generate the next state by applying the 
-          -- expression on the left bit, state bit, and
-          -- right bit
-          if (gen_r = '1') then
-            -- if generate is high, the first output is not yet
-            -- valid, so valid is delayed a single clock cycle
-            gen_valid_r <= '1';
-            generate_next_state : for b in 1 to w_casr_g loop
-              -- get left bit of state bit b
-              l := ext_casr_r(b-1);
-              -- get state bit b
-              c := ext_casr_r(b);
-              -- get right bit of state bit b
-              r := ext_casr_r(b+1);
+        -- if gen_i is high and init_i is low,
+        -- generate the next state by applying the 
+        -- expression on the left bit, state bit, and
+        -- right bit
+        elsif (gen_r = '1' and seed_valid_r = '1') then
+          -- if generate is high, the first output is not yet
+          -- valid, so valid is delayed a single clock cycle
+          gen_valid_r <= '1';
+          generate_next_state : for b in 1 to w_casr_g loop
+            -- get left bit of state bit b
+            l := ext_casr_r(b-1);
+            -- get state bit b
+            c := ext_casr_r(b);
+            -- get right bit of state bit b
+            r := ext_casr_r(b+1);
 
-              -- for each bit, check associated rule.
-              -- when rule_r(b-1) = '0', use rule 90
-              -- when rule_r(b-1) = '1', use rule 150
-              if (rule_r(b-1) = '0') then
-                -- generate next bit state using rule 90
-                exp1 := l xor r;
-              else
-                -- generate next bit state using rule 150
-                exp1 := l xor c xor r;
-              end if;
+            -- for each bit, check associated rule.
+            -- when rule_r(b-1) = '0', use rule 90
+            -- when rule_r(b-1) = '1', use rule 150
+            if (rule_r(b-1) = '0') then
+              -- generate next bit state using rule 90
+              exp1 := l xor r;
+            else
+              -- generate next bit state using rule 150
+              exp1 := l xor c xor r;
+            end if;
 
-              -- store the new state bit
-              new_ext_casr_v(b) := exp1;
-              -- generate the extention bits for next round
-              new_ext_casr_v(0)          := new_ext_casr_v(w_casr_g);
-              new_ext_casr_v(w_casr_g+1) := new_ext_casr_v(1);
-            end loop generate_next_state;
-            ext_casr_r <= new_ext_casr_v;
-          end if;
+            -- store the new state bit
+            new_ext_casr_v(b) := exp1;
+            -- generate the extention bits for next round
+            new_ext_casr_v(0)          := new_ext_casr_v(w_casr_g);
+            new_ext_casr_v(w_casr_g+1) := new_ext_casr_v(1);
+          end loop generate_next_state;
+          ext_casr_r <= new_ext_casr_v;
         end if;
+
         if (clr_r = '1') then
-          gen_r       <= '0';
-          gen_valid_r <= '0';
+          gen_r        <= '0';
+          gen_valid_r  <= '0';
+          seed_valid_r <= '0';
+
         end if;
       end if;
     end if;
