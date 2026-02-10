@@ -5,7 +5,7 @@
 -- File        : casr_90150h.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Created     : Sun Jan 11 10:20:17 2026
--- Last update : Sun Jan 11 12:23:39 2026
+-- Last update : Tue Feb 10 09:56:44 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -58,9 +58,9 @@ end entity casr_90150h;
 
 architecture arch of casr_90150h is
 
-  signal clr_r  : std_logic;
-  signal enb_r  : std_logic;
-  signal gen_r  : std_logic;
+  signal clr_r : std_logic;
+  signal enb_r : std_logic;
+  signal gen_r : std_logic;
 
   -- extended casr for generating the next state
   -- two additional bits are used to connect the 
@@ -121,52 +121,52 @@ begin
   -- store rule_i into register only when init_i is
   -- high. Only a single rule vector can be used for 
   -- each seed
-  gen_static_rule_vector : if (r_dyn_g = '0') generate
-
-    gen_static_rule_proc : process (clk, rst)
-    begin
-      if (rst = '0') then
-        rule_r <= (others => '0');
-      elsif rising_edge(clk) then
-        if (enb_r = '1') then
-          -- store the rule vector only when init is done
-          if (init_i = '1') then
-            rule_r <= rule_i;
-          end if;
-
-          if (clr_r = '1') then
-            rule_r <= (others => '0');
-          end if;
-
-        end if;
-      end if;
-    end process gen_static_rule_proc;
-
-  end generate gen_static_rule_vector;
+  --gen_static_rule_vector : if (r_dyn_g = '0') generate
+  --
+  --  gen_static_rule_proc : process (clk, rst)
+  --  begin
+  --    if (rst = '0') then
+  --      rule_r <= (others => '0');
+  --    elsif rising_edge(clk) then
+  --      if (enb_r = '1') then
+  --        -- store the rule vector only when init is done
+  --        if (init_i = '1') then
+  --          rule_r <= rule_i;
+  --        end if;
+  --
+  --        if (clr_r = '1') then
+  --          rule_r <= (others => '0');
+  --        end if;
+  --
+  --      end if;
+  --    end if;
+  --  end process gen_static_rule_proc;
+  --
+  --end generate gen_static_rule_vector;
 
   -- when r_dyn_g = '1'
   -- store rule_i into register at every clock cycle 
   -- when the block is enabled. multiple rule vectors
   -- can be used with a single seed
-  gen_dynamic_rule_vector : if (r_dyn_g = '0') generate
-
-    gen_dynamic_rule_proc : process (clk, rst)
-    begin
-      if (rst = '0') then
-        rule_r <= (others => '0');
-      elsif rising_edge(clk) then
-        if (enb_r = '1') then
-          -- store the rule vector at every enabled clock cycle
-          rule_r <= rule_i;
-          if (clr_r = '1') then
-            rule_r <= (others => '0');
-          end if;
-
-        end if;
-      end if;
-    end process gen_dynamic_rule_proc;
-
-  end generate gen_dynamic_rule_vector;
+  --gen_dynamic_rule_vector : if (r_dyn_g = '0') generate
+  --
+  --  gen_dynamic_rule_proc : process (clk, rst)
+  --  begin
+  --    if (rst = '0') then
+  --      rule_r <= (others => '0');
+  --    elsif rising_edge(clk) then
+  --      if (enb_r = '1') then
+  --        -- store the rule vector at every enabled clock cycle
+  --        rule_r <= rule_i;
+  --        if (clr_r = '1') then
+  --          rule_r <= (others => '0');
+  --        end if;
+  --
+  --      end if;
+  --    end if;
+  --  end process gen_dynamic_rule_proc;
+  --
+  --end generate gen_dynamic_rule_vector;
 
 
   ctrl_proc : process (clk, rst)
@@ -204,11 +204,12 @@ begin
       gen_r       <= '0';
       gen_valid_r <= '0';
       ext_casr_r  <= (others => '0');
+      rule_r      <= (others => '0');
     elsif rising_edge(clk) then
       if (enb_r = '1') then
-        gen_r  <= gen_i;
         -- output is invalid by default
         gen_valid_r <= '0';
+        gen_r       <= gen_i;
 
         -- load the seed when init_i is high
         if (init_i = '1') then
@@ -220,6 +221,7 @@ begin
           -- first output after init is invalid as
           -- it is the o_bit of the seed
           gen_valid_r <= '0';
+          rule_r      <= rule_i;
 
         else
           -- if gen_i is high and init_i is low,
