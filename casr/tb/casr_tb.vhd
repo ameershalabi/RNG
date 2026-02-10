@@ -63,18 +63,18 @@ begin
 
   tb_clk <= not tb_clk after clk_period when tb_done /= '1' else '0';
 
-  process begin
-    tb_rst_n <= '0';
-    wait for 2*clk_period; wait until rising_edge(tb_clk);
-    tb_rst_n <= '1';
-    wait until rising_edge(tb_clk);
-    tb_clr <= '1';
-    tb_enb <= '1';
-    wait until rising_edge(tb_clk);
-    tb_clr      <= '0';
-    tb_rst_done <= '1';
-    wait;
-  end process;
+  --process begin
+  --  tb_rst_n <= '0';
+  --  wait for 2*clk_period; wait until rising_edge(tb_clk);
+  --  tb_rst_n <= '1';
+  --  wait until rising_edge(tb_clk);
+  --  tb_clr <= '1';
+  --  tb_enb <= '1';
+  --  wait until rising_edge(tb_clk);
+  --  tb_clr      <= '0';
+  --  tb_rst_done <= '1';
+  --  wait;
+  --end process;
 
   u_casr_30_p : entity work.casr_30
     Generic map(
@@ -151,10 +151,23 @@ begin
     );
 
   process begin
-    wait until tb_rst_done='1';
+
+    tb_rst_n <= '0';
+    wait for 2*clk_period; wait until rising_edge(tb_clk);
+    tb_rst_n <= '1';
+    wait until rising_edge(tb_clk);
+    tb_clr <= '1';
+    tb_enb <= '1';
+    wait until rising_edge(tb_clk);
+    tb_clr      <= '0';
+    tb_rst_done <= '1';
+
+    --wait until tb_rst_done='1';
     wait for 2*clk_period;
     wait until rising_edge(tb_clk);
-
+    ----------------------------------------
+    -- FIRST RESET IS DONE - START MAIN TEST
+    ----------------------------------------
     -- get seeds
     casr_30_seed_i  <= casr30_seed1_c;
     casr_90_seed_i  <= casr90_seed1_c;
@@ -162,15 +175,11 @@ begin
     h90150_seed_i   <= casr90150h_seed1_c;
     h90150_rule_i   <= casr90150h_rule1_c;
     -- trigger init
-    casr_30_init_i  <= '1';
-    casr_90_init_i  <= '1';
-    casr_150_init_i <= '1';
-    h90150_init_i   <= '1';
+    casr_30_init_i  <= '1'; casr_30_gen_i <= '1';
+    casr_90_init_i  <= '1'; casr_90_gen_i <= '1';
+    casr_150_init_i <= '1'; casr_150_gen_i <= '1';
+    h90150_init_i   <= '1'; h90150_gen_i <= '1';
     -- trigger gen
-    casr_30_gen_i  <= '1';
-    casr_90_gen_i  <= '1';
-    casr_150_gen_i <= '1';
-    h90150_gen_i   <= '1';
     wait until rising_edge(tb_clk);
     -- single clock init ends
     casr_30_init_i  <= '0';
@@ -178,11 +187,11 @@ begin
     casr_150_init_i <= '0';
     h90150_init_i   <= '0';
     wait until rising_edge(tb_clk);
-      casr_30_tst_vec  <= casr30_vectors(0);
-      casr_90_tst_vec  <= casr90_vectors(0);
-      casr_150_tst_vec <= casr150_vectors(0);
-      h90150_tst_vec   <= casr90150h_vectors(0);
-    out_check_loop : for o in 0 to 50 loop
+    casr_30_tst_vec  <= casr30_vectors(0);
+    casr_90_tst_vec  <= casr90_vectors(0);
+    casr_150_tst_vec <= casr150_vectors(0);
+    h90150_tst_vec   <= casr90150h_vectors(0);
+    main_test_loop : for o in 0 to 25 loop
       wait until rising_edge(tb_clk);
       if casr_30_valid_o = '1' then
         assert (casr_30_state_o = casr30_vectors(o)) report "casr_30_mismatch" severity error;
@@ -203,7 +212,149 @@ begin
       casr_90_tst_vec  <= casr90_vectors(o+1);
       casr_150_tst_vec <= casr150_vectors(o+1);
       h90150_tst_vec   <= casr90150h_vectors(o+1);
-    end loop out_check_loop;
+    end loop main_test_loop;
+    casr_30_gen_i  <= '0';
+    casr_90_gen_i  <= '0';
+    casr_150_gen_i <= '0';
+    h90150_gen_i   <= '0';
+    wait for 10*clk_period;
+    wait until rising_edge(tb_clk);
+
+    ----------------------------------------
+    -- MAIN TEST IS DONE - START CLEAR TEST
+    ----------------------------------------
+
+    tb_rst_n <= '0';
+    wait for 2*clk_period; wait until rising_edge(tb_clk);
+    tb_rst_n <= '1';
+    wait until rising_edge(tb_clk);
+    tb_clr <= '1';
+    tb_enb <= '1';
+    wait until rising_edge(tb_clk);
+    tb_clr      <= '0';
+    tb_rst_done <= '1';
+
+    --wait until tb_rst_done='1';
+    wait for 2*clk_period;
+    wait until rising_edge(tb_clk);
+    -- get seeds
+    casr_30_seed_i  <= casr30_seed1_c;
+    casr_90_seed_i  <= casr90_seed1_c;
+    casr_150_seed_i <= casr150_seed1_c;
+    h90150_seed_i   <= casr90150h_seed1_c;
+    h90150_rule_i   <= casr90150h_rule1_c;
+    -- trigger init
+    casr_30_init_i  <= '1'; casr_30_gen_i <= '1';
+    casr_90_init_i  <= '1'; casr_90_gen_i <= '1';
+    casr_150_init_i <= '1'; casr_150_gen_i <= '1';
+    h90150_init_i   <= '1'; h90150_gen_i <= '1';
+    -- trigger gen
+    wait until rising_edge(tb_clk);
+    -- single clock init ends
+    casr_30_init_i  <= '0';
+    casr_90_init_i  <= '0';
+    casr_150_init_i <= '0';
+    h90150_init_i   <= '0';
+    wait until rising_edge(tb_clk);
+    casr_30_tst_vec  <= casr30_vectors(0);
+    casr_90_tst_vec  <= casr90_vectors(0);
+    casr_150_tst_vec <= casr150_vectors(0);
+    h90150_tst_vec   <= casr90150h_vectors(0);
+    second_test_loop : for o in 0 to 25 loop
+      tb_clr <= '0';
+      if (o = 15) then
+        tb_clr <= '1';
+      end if;
+      wait until rising_edge(tb_clk);
+      if casr_30_valid_o = '1' then
+        assert (casr_30_state_o = casr30_vectors(o)) report "casr_30_mismatch" severity error;
+        casr_30_tst_vec <= casr30_vectors(o+1);
+      end if;
+
+      if casr_90_valid_o = '1' then
+        assert (casr_90_state_o = casr90_vectors(o)) report "casr_90_mismatch" severity error;
+        casr_90_tst_vec <= casr90_vectors(o+1);
+      end if;
+
+      if casr_150_valid_o = '1' then
+        assert (casr_150_state_o = casr150_vectors(o)) report "casr_150_mismatch" severity error;
+        casr_150_tst_vec <= casr150_vectors(o+1);
+      end if;
+
+      if h90150_valid_o = '1' then
+        assert (h90150_state_o = casr90150h_vectors(o)) report "casr_h_mismatch" severity error;
+        h90150_tst_vec <= casr90150h_vectors(o+1);
+      end if;
+    end loop second_test_loop;
+    casr_30_gen_i  <= '0';
+    casr_90_gen_i  <= '0';
+    casr_150_gen_i <= '0';
+    h90150_gen_i   <= '0';
+    wait for 10*clk_period;
+    wait until rising_edge(tb_clk);
+
+    ----------------------------------------
+    -- CLEAR TEST IS DONE - START LAST TEST
+    ----------------------------------------
+
+    --tb_rst_n <= '0';
+    --wait for 2*clk_period; wait until rising_edge(tb_clk);
+    --tb_rst_n <= '1';
+    --wait until rising_edge(tb_clk);
+    --tb_clr <= '1';
+    --tb_enb <= '1';
+    --wait until rising_edge(tb_clk);
+    --tb_clr      <= '0';
+    --tb_rst_done <= '1';
+
+    --wait until tb_rst_done='1';
+    wait for 2*clk_period;
+    wait until rising_edge(tb_clk);
+    -- get seeds
+    casr_30_seed_i  <= casr30_seed1_c;
+    casr_90_seed_i  <= casr90_seed1_c;
+    casr_150_seed_i <= casr150_seed1_c;
+    h90150_seed_i   <= casr90150h_seed1_c;
+    h90150_rule_i   <= casr90150h_rule1_c;
+    -- trigger init
+    casr_30_init_i  <= '1'; casr_30_gen_i <= '1';
+    casr_90_init_i  <= '1'; casr_90_gen_i <= '1';
+    casr_150_init_i <= '1'; casr_150_gen_i <= '1';
+    h90150_init_i   <= '1'; h90150_gen_i <= '1';
+    -- trigger gen
+    wait until rising_edge(tb_clk);
+    -- single clock init ends
+    casr_30_init_i  <= '0';
+    casr_90_init_i  <= '0';
+    casr_150_init_i <= '0';
+    h90150_init_i   <= '0';
+    wait until rising_edge(tb_clk);
+    casr_30_tst_vec  <= casr30_vectors(0);
+    casr_90_tst_vec  <= casr90_vectors(0);
+    casr_150_tst_vec <= casr150_vectors(0);
+    h90150_tst_vec   <= casr90150h_vectors(0);
+    last_test_loop : for o in 0 to 25 loop
+      wait until rising_edge(tb_clk);
+      if casr_30_valid_o = '1' then
+        casr_30_tst_vec <= casr30_vectors(o+1);
+        assert (casr_30_state_o = casr30_vectors(o)) report "casr_30_mismatch" severity error;
+      end if;
+
+      if casr_90_valid_o = '1' then
+        casr_90_tst_vec <= casr90_vectors(o+1);
+        assert (casr_90_state_o = casr90_vectors(o)) report "casr_90_mismatch" severity error;
+      end if;
+
+      if casr_150_valid_o = '1' then
+        casr_150_tst_vec <= casr150_vectors(o+1);
+        assert (casr_150_state_o = casr150_vectors(o)) report "casr_150_mismatch" severity error;
+      end if;
+
+      if h90150_valid_o = '1' then
+        h90150_tst_vec <= casr90150h_vectors(o+1);
+        assert (h90150_state_o = casr90150h_vectors(o)) report "casr_h_mismatch" severity error;
+      end if;
+    end loop last_test_loop;
     casr_30_gen_i  <= '0';
     casr_90_gen_i  <= '0';
     casr_150_gen_i <= '0';
