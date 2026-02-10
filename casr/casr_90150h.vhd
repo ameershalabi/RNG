@@ -5,7 +5,7 @@
 -- File        : casr_90150h.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Created     : Sun Jan 11 10:20:17 2026
--- Last update : Tue Feb 10 15:17:02 2026
+-- Last update : Tue Feb 10 16:20:35 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -191,7 +191,7 @@ begin
   --           LSBext
 
   -- output bit is valid when
-  gen_valid <= '1' when gen_valid_r = '1' and gen_r = '1' else '0';
+  gen_valid <= '1' when gen_valid_r = '1' else '0'; --and gen_r = '1' else '0';
 
   gen_proc : process (clk, rst)
     variable l              : std_logic;
@@ -223,7 +223,7 @@ begin
           -- first output after init is invalid as
           -- it is the o_bit of the seed
           gen_valid_r  <= '0';
-          seed_valid_r <= '0';
+          seed_valid_r <= '1';
           rule_r       <= rule_i;
 
         -- if gen_i is high and init_i is low,
