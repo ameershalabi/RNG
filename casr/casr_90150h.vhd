@@ -5,7 +5,7 @@
 -- File        : casr_90150h.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Created     : Sun Jan 11 10:20:17 2026
--- Last update : Sun Jan 11 12:23:39 2026
+-- Last update : Tue Feb 10 16:20:35 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -58,14 +58,15 @@ end entity casr_90150h;
 
 architecture arch of casr_90150h is
 
-  signal clr_r  : std_logic;
-  signal enb_r  : std_logic;
-  signal gen_r  : std_logic;
+  signal clr_r : std_logic;
+  signal enb_r : std_logic;
+  signal gen_r : std_logic;
 
   -- extended casr for generating the next state
   -- two additional bits are used to connect the 
   -- register ends
-  signal ext_casr_r : std_logic_vector(w_casr_g+1 downto 0);
+  signal ext_casr_r   : std_logic_vector(w_casr_g+1 downto 0);
+  signal seed_valid_r : std_logic;
 
   -- register to store the bit rules
   signal rule_r : std_logic_vector(w_casr_g-1 downto 0);
@@ -121,52 +122,52 @@ begin
   -- store rule_i into register only when init_i is
   -- high. Only a single rule vector can be used for 
   -- each seed
-  gen_static_rule_vector : if (r_dyn_g = '0') generate
-
-    gen_static_rule_proc : process (clk, rst)
-    begin
-      if (rst = '0') then
-        rule_r <= (others => '0');
-      elsif rising_edge(clk) then
-        if (enb_r = '1') then
-          -- store the rule vector only when init is done
-          if (init_i = '1') then
-            rule_r <= rule_i;
-          end if;
-
-          if (clr_r = '1') then
-            rule_r <= (others => '0');
-          end if;
-
-        end if;
-      end if;
-    end process gen_static_rule_proc;
-
-  end generate gen_static_rule_vector;
+  --gen_static_rule_vector : if (r_dyn_g = '0') generate
+  --
+  --  gen_static_rule_proc : process (clk, rst)
+  --  begin
+  --    if (rst = '0') then
+  --      rule_r <= (others => '0');
+  --    elsif rising_edge(clk) then
+  --      if (enb_r = '1') then
+  --        -- store the rule vector only when init is done
+  --        if (init_i = '1') then
+  --          rule_r <= rule_i;
+  --        end if;
+  --
+  --        if (clr_r = '1') then
+  --          rule_r <= (others => '0');
+  --        end if;
+  --
+  --      end if;
+  --    end if;
+  --  end process gen_static_rule_proc;
+  --
+  --end generate gen_static_rule_vector;
 
   -- when r_dyn_g = '1'
   -- store rule_i into register at every clock cycle 
   -- when the block is enabled. multiple rule vectors
   -- can be used with a single seed
-  gen_dynamic_rule_vector : if (r_dyn_g = '0') generate
-
-    gen_dynamic_rule_proc : process (clk, rst)
-    begin
-      if (rst = '0') then
-        rule_r <= (others => '0');
-      elsif rising_edge(clk) then
-        if (enb_r = '1') then
-          -- store the rule vector at every enabled clock cycle
-          rule_r <= rule_i;
-          if (clr_r = '1') then
-            rule_r <= (others => '0');
-          end if;
-
-        end if;
-      end if;
-    end process gen_dynamic_rule_proc;
-
-  end generate gen_dynamic_rule_vector;
+  --gen_dynamic_rule_vector : if (r_dyn_g = '0') generate
+  --
+  --  gen_dynamic_rule_proc : process (clk, rst)
+  --  begin
+  --    if (rst = '0') then
+  --      rule_r <= (others => '0');
+  --    elsif rising_edge(clk) then
+  --      if (enb_r = '1') then
+  --        -- store the rule vector at every enabled clock cycle
+  --        rule_r <= rule_i;
+  --        if (clr_r = '1') then
+  --          rule_r <= (others => '0');
+  --        end if;
+  --
+  --      end if;
+  --    end if;
+  --  end process gen_dynamic_rule_proc;
+  --
+  --end generate gen_dynamic_rule_vector;
 
 
   ctrl_proc : process (clk, rst)
@@ -190,7 +191,7 @@ begin
   --           LSBext
 
   -- output bit is valid when
-  gen_valid <= '1' when gen_valid_r = '1' and gen_r = '1' else '0';
+  gen_valid <= '1' when gen_valid_r = '1' else '0'; --and gen_r = '1' else '0';
 
   gen_proc : process (clk, rst)
     variable l              : std_logic;
@@ -201,14 +202,16 @@ begin
 
   begin
     if (rst = '0') then
-      gen_r       <= '0';
-      gen_valid_r <= '0';
-      ext_casr_r  <= (others => '0');
+      gen_r        <= '0';
+      gen_valid_r  <= '0';
+      seed_valid_r <= '0';
+      ext_casr_r   <= (others => '0');
+      rule_r       <= (others => '0');
     elsif rising_edge(clk) then
       if (enb_r = '1') then
-        gen_r  <= gen_i;
         -- output is invalid by default
         gen_valid_r <= '0';
+        gen_r       <= gen_i;
 
         -- load the seed when init_i is high
         if (init_i = '1') then
@@ -219,48 +222,51 @@ begin
           ext_casr_r(w_casr_g+1) <= seed_i(0);
           -- first output after init is invalid as
           -- it is the o_bit of the seed
-          gen_valid_r <= '0';
+          gen_valid_r  <= '0';
+          seed_valid_r <= '1';
+          rule_r       <= rule_i;
 
-        else
-          -- if gen_i is high and init_i is low,
-          -- generate the next state by applying the 
-          -- expression on the left bit, state bit, and
-          -- right bit
-          if (gen_r = '1') then
-            -- if generate is high, the first output is not yet
-            -- valid, so valid is delayed a single clock cycle
-            gen_valid_r <= '1';
-            generate_next_state : for b in 1 to w_casr_g loop
-              -- get left bit of state bit b
-              l := ext_casr_r(b-1);
-              -- get state bit b
-              c := ext_casr_r(b);
-              -- get right bit of state bit b
-              r := ext_casr_r(b+1);
+        -- if gen_i is high and init_i is low,
+        -- generate the next state by applying the 
+        -- expression on the left bit, state bit, and
+        -- right bit
+        elsif (gen_r = '1' and seed_valid_r = '1') then
+          -- if generate is high, the first output is not yet
+          -- valid, so valid is delayed a single clock cycle
+          gen_valid_r <= '1';
+          generate_next_state : for b in 1 to w_casr_g loop
+            -- get left bit of state bit b
+            l := ext_casr_r(b-1);
+            -- get state bit b
+            c := ext_casr_r(b);
+            -- get right bit of state bit b
+            r := ext_casr_r(b+1);
 
-              -- for each bit, check associated rule.
-              -- when rule_r(b-1) = '0', use rule 90
-              -- when rule_r(b-1) = '1', use rule 150
-              if (rule_r(b-1) = '0') then
-                -- generate next bit state using rule 90
-                exp1 := l xor r;
-              else
-                -- generate next bit state using rule 150
-                exp1 := l xor c xor r;
-              end if;
+            -- for each bit, check associated rule.
+            -- when rule_r(b-1) = '0', use rule 90
+            -- when rule_r(b-1) = '1', use rule 150
+            if (rule_r(b-1) = '0') then
+              -- generate next bit state using rule 90
+              exp1 := l xor r;
+            else
+              -- generate next bit state using rule 150
+              exp1 := l xor c xor r;
+            end if;
 
-              -- store the new state bit
-              new_ext_casr_v(b) := exp1;
-              -- generate the extention bits for next round
-              new_ext_casr_v(0)          := new_ext_casr_v(w_casr_g);
-              new_ext_casr_v(w_casr_g+1) := new_ext_casr_v(1);
-            end loop generate_next_state;
-            ext_casr_r <= new_ext_casr_v;
-          end if;
+            -- store the new state bit
+            new_ext_casr_v(b) := exp1;
+            -- generate the extention bits for next round
+            new_ext_casr_v(0)          := new_ext_casr_v(w_casr_g);
+            new_ext_casr_v(w_casr_g+1) := new_ext_casr_v(1);
+          end loop generate_next_state;
+          ext_casr_r <= new_ext_casr_v;
         end if;
+
         if (clr_r = '1') then
-          gen_r       <= '0';
-          gen_valid_r <= '0';
+          gen_r        <= '0';
+          gen_valid_r  <= '0';
+          seed_valid_r <= '0';
+
         end if;
       end if;
     end if;
