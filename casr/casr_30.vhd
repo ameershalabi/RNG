@@ -5,7 +5,7 @@
 -- File        : casr_30.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Created     : Fri Jan  9 14:22:18 2026
--- Last update : Sun Jan 11 11:35:39 2026
+-- Last update : Tue Feb 10 15:15:17 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -51,14 +51,15 @@ end entity casr_30;
 
 architecture arch of casr_30 is
 
-  signal clr_r  : std_logic;
-  signal enb_r  : std_logic;
-  signal gen_r  : std_logic;
+  signal clr_r : std_logic;
+  signal enb_r : std_logic;
+  signal gen_r : std_logic;
 
   -- extended casr for generating the next state
   -- two additional bits are used to connect the 
   -- register ends
-  signal ext_casr_r : std_logic_vector(w_casr_g+1 downto 0);
+  signal ext_casr_r   : std_logic_vector(w_casr_g+1 downto 0);
+  signal seed_valid_r : std_logic;
 
   -- output bit signals
   signal gen_valid   : std_logic;
@@ -129,7 +130,7 @@ begin
   --           LSBext
 
   -- output bit is valid when
-  gen_valid <= '1' when gen_valid_r = '1' and gen_r = '1' else '0';
+  gen_valid <= '1' when gen_valid_r = '1' else '0'; --and gen_r = '1' else '0';
 
   gen_proc : process (clk, rst)
     variable l              : std_logic;
@@ -142,12 +143,13 @@ begin
 
   begin
     if (rst = '0') then
-      gen_r       <= '0';
-      gen_valid_r <= '0';
-      ext_casr_r  <= (others => '0');
+      gen_r        <= '0';
+      gen_valid_r  <= '0';
+      seed_valid_r <= '0';
+      ext_casr_r   <= (others => '0');
     elsif rising_edge(clk) then
       if (enb_r = '1') then
-        gen_r       <= gen_i;
+        gen_r <= gen_i;
         -- output is invalid by default
         gen_valid_r <= '0';
 
@@ -160,15 +162,14 @@ begin
           ext_casr_r(w_casr_g+1) <= seed_i(0);
           -- first output after init is invalid as
           -- it is the o_bit of the seed
-          gen_valid_r <= '0';
-        end if;
+          gen_valid_r  <= '0';
+          seed_valid_r <= '1';
 
-        --else
         -- if gen_i is high and init_i is low,
         -- generate the next state by applying the 
         -- expression on the left bit, state bit, and
         -- right bit
-        if (gen_r = '1') then
+        elsif (gen_r = '1' and seed_valid_r = '1') then
           -- if generate is high, the first output is not yet
           -- valid, so valid is delayed a single clock cycle
           gen_valid_r <= '1';
@@ -194,10 +195,11 @@ begin
           end loop generate_next_state;
           ext_casr_r <= new_ext_casr_v;
         end if;
-        --end if;
         if (clr_r = '1') then
-          gen_r       <= '0';
-          gen_valid_r <= '0';
+          gen_r        <= '0';
+          gen_valid_r  <= '0';
+          seed_valid_r <= '0';
+
         end if;
       end if;
     end if;
