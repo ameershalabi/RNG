@@ -1,0 +1,240 @@
+rm -f results.xml
+"make" -f Makefile results.xml
+make[1]: Entering directory '/mnt/e/vhdl/RNG/casr/verif/casr30/casr30_test1'
+\
+/usr/bin/ghdl -i   --workdir=sim_build --work=work /mnt/e/vhdl/RNG/casr/casr_30.vhd && \
+/usr/bin/ghdl -m   --workdir=sim_build -Psim_build --work=work casr_30 
+rm -f results.xml
+COCOTB_TEST_MODULES=test1 COCOTB_TESTCASE= COCOTB_TEST_FILTER= COCOTB_TOPLEVEL=casr_30 TOPLEVEL_LANG=vhdl \
+ /usr/bin/ghdl -r  --time-resolution=ps --workdir=sim_build -Psim_build --work=work casr_30  --vpi=/mnt/e/vhdl/RNG/casr/verif/venv/lib/python3.12/site-packages/cocotb/libs/libcocotbvpi_ghdl.so -gw_casr_g=64 -go_mode_g=\'1\' --vcd=sim.vcd  
+loading VPI module '/mnt/e/vhdl/RNG/casr/verif/venv/lib/python3.12/site-packages/cocotb/libs/libcocotbvpi_ghdl.so'
+     -.--ns INFO     gpi                                ..mbed/gpi_embed.cpp:93   in _embed_init_python              Using Python 3.12.4 interpreter at /mnt/e/vhdl/RNG/casr/verif/venv/bin/python3
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:79   in gpi_print_registered_impl       VPI registered
+VPI module loaded!
+     0.00ns INFO     cocotb                             Running on GHDL version 4.1.0 (Ubuntu 4.1.0+dfsg-0ubuntu2.1) [Dunoon edition]
+     0.00ns WARNING  gpi                                vpi_iterate returned NULL for type vpiInstance for object NULL
+     0.00ns INFO     cocotb                             Seeding Python random module with 1770999003
+     0.00ns INFO     cocotb                             Initialized cocotb v2.0.1 from /mnt/e/vhdl/RNG/casr/verif/venv/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.regression                  pytest not found, install it to enable better AssertionError messages
+     0.00ns INFO     cocotb                             Running tests
+     0.00ns INFO     cocotb.regression                  running test1.test1 (1/1)
+    20.00ns INFO     cocotb.casr_30                     Reset complete
+    20.00ns INFO     cocotb.casr_30                     Enabled
+    20.00ns INFO     cocotb.casr_30                     Clear complete
+    40.00ns INFO     cocotb.casr_30                     Seed loaded
+    50.00ns INFO     cocotb.casr_30                     Step 0: waiting... - NOT VALID YET
+    60.00ns INFO     cocotb.casr_30                     Step 0: state = -3277053635541323643 (0xD2859114BFA83085) - VALID
+    70.00ns INFO     cocotb.casr_30                     Step 1: state = 6831111500370565580 (0x5ECCFBB780AC59CC) - VALID
+    80.00ns INFO     cocotb.casr_30                     Step 2: state = -4434065890305716618 (0xC2770890C1A6CE76) - VALID
+    90.00ns INFO     cocotb.casr_30                     Step 3: state = 7462919751958426514 (0x67919DF962BA7392) - VALID
+   100.00ns INFO     cocotb.casr_30                     Step 4: state = -5117527272562385665 (0xB8FAE40F368B9CFF) - VALID
+   110.00ns INFO     cocotb.casr_30                     Step 5: state = -8283740318321809664 (0x8D0A3E11D2D8E700) - VALID
+   120.00ns INFO     cocotb.casr_30                     Step 6: state = -3054774004271466111 (0xD59B433A5E4D3981) - VALID
+   130.00ns INFO     cocotb.casr_30                     Step 7: state = 6118533494599962306 (0x54E965CBC3F5CEC2) - VALID
+   140.00ns INFO     cocotb.casr_30                     Step 8: state = -2941065543876840857 (0xD72F3C7864147267) - VALID
+   150.00ns INFO     cocotb.casr_30                     Step 9: state = 5900215294621032376 (0x51E1C68CBE369FB8) - VALID
+   160.00ns INFO     cocotb.casr_30                     Step 10: state = -2723997350751969140 (0xDA326AD78352E08C) - VALID
+   170.00ns INFO     cocotb.casr_30                     Step 11: state = 5431246939517497815 (0x4B5FAA50C55E31D7) - VALID
+   180.00ns INFO     cocotb.casr_30                     Step 12: state = 8737172227428145745 (0x7940ABD96D435A51) - VALID
+   190.00ns INFO     cocotb.casr_30                     Step 13: state = 1108352041193130971 (0x0F61A84F25654BDB) - VALID
+   200.00ns INFO     cocotb.casr_30                     Step 14: state = -7984129034038708151 (0x9132ACF1FD3D7849) - VALID
+   210.00ns INFO     cocotb.casr_30                     Step 15: state = -297616795152085762 (0xFBDEA71A05C50CFE) - VALID
+   220.00ns INFO     cocotb.casr_30                     Step 16: state = 595242245065381634 (0x0842B9AB0C6D9702) - VALID
+   230.00ns INFO     cocotb.casr_30                     Step 17: state = 2082508736733442439 (0x1CE68EA996A4F187) - VALID
+   240.00ns INFO     cocotb.casr_30                     Step 18: state = -6396568671887615287 (0xA73AD2AEF2BF1AC9) - VALID
+   250.00ns INFO     cocotb.casr_30                     Step 19: state = -5059127181007803778 (0xB9CA5EA21E81AA7E) - VALID
+   260.00ns INFO     cocotb.casr_30                     Step 20: state = -8179730206370387070 (0x8E7BC2B722C2AB82) - VALID
+   270.00ns INFO     cocotb.casr_30                     Step 21: state = -3204198357783893818 (0xD3886691F666A8C6) - VALID
+   280.00ns INFO     cocotb.casr_30                     Step 22: state = 6691428729601305962 (0x5CDCBAFA13BAAD6A) - VALID
+   290.00ns INFO     cocotb.casr_30                     Step 23: state = -4087146355950443221 (0xC7478A0B3C8AA52B) - VALID
+   300.00ns INFO     cocotb.casr_30                     Step 24: state = 7595561675334008296 (0x6968DB19C7DABDE8) - VALID
+   310.00ns INFO     cocotb.casr_30                     Step 25: state = -5823917729697332180 (0xAF2D49AE684A842C) - VALID
+   320.00ns INFO     cocotb.casr_30                     Step 26: state = -6780874422489526681 (0xA1E57EA3ACFACE67) - VALID
+   330.00ns INFO     cocotb.casr_30                     Step 27: state = -5603319386459180104 (0xB23D02B4A70A73B8) - VALID
+   340.00ns INFO     cocotb.casr_30                     Step 28: state = -6970016862073807731 (0x9F458697B99B9C8D) - VALID
+   350.00ns INFO     cocotb.casr_30                     Step 29: state = -2203162983152425004 (0xE16CCAF08EE8E7D4) - VALID
+   360.00ns INFO     cocotb.casr_30                     Step 30: state = 3686049071344990295 (0x33277A19D22D3857) - VALID
+   370.00ns INFO     cocotb.casr_30                     Step 31: state = -2451916228329616175 (0xDDF90B2E5F65CCD1) - VALID
+   380.00ns INFO     cocotb.casr_30                     Step 32: state = 4904307722708350810 (0x440F99E3C13C775A) - VALID
+   390.00ns INFO     cocotb.casr_30                     Step 33: state = -1292271184275664565 (0xEE10EE3463C6914B) - VALID
+   400.00ns INFO     cocotb.casr_30                     Step 34: state = 2538098720301054840 (0x23392356B46AFB78) - VALID
+   410.00ns INFO     cocotb.casr_30                     Step 35: state = 8489273557680523532 (0x75CFF55296AA090C) - VALID
+   420.00ns INFO     cocotb.casr_30                     Step 36: state = -7750671461162213482 (0x9470155EF2AB1F96) - VALID
+   430.00ns INFO     cocotb.casr_30                     Step 37: state = -677733185820712718 (0xF69835421EA9A0F2) - VALID
+   440.00ns INFO     cocotb.casr_30                     Step 38: state = 1363558688638284062 (0x12EC556722AEB11E) - VALID
+   450.00ns INFO     cocotb.casr_30                     Step 39: state = 4478501324394240931 (0x3E26D539F6A29BA3) - VALID
+   460.00ns INFO     cocotb.casr_30                     Step 40: state = -4361078945589303115 (0xC37A55CE12B6E8B5) - VALID
+   470.00ns INFO     cocotb.casr_30                     Step 41: state = 7281146814010633620 (0x650BD4733E922D94) - VALID
+   480.00ns INFO     cocotb.casr_30                     Step 42: state = -4784979368499780362 (0xBD98569DC2FF64F6) - VALID
+   490.00ns INFO     cocotb.casr_30                     Step 43: state = -8868481687793615086 (0x84ECD2E466013F12) - VALID
+   500.00ns INFO     cocotb.casr_30                     Step 44: state = -3519740960248184386 (0xCF275E3EBB03C1BE) - VALID
+   510.00ns INFO     cocotb.casr_30                     Step 45: state = 8212669348540867202 (0x71F9434289846282) - VALID
+   520.00ns INFO     cocotb.casr_30                     Step 46: state = -7345540974718830905 (0x9A0F6566DECEB6C7) - VALID
+   530.00ns INFO     cocotb.casr_30                     Step 47: state = -1508357079760203160 (0xEB113D3A42729268) - VALID
+   540.00ns INFO     cocotb.casr_30                     Step 48: state = 3007214655754928045 (0x29BBC5CBE79EFFAD) - VALID
+   550.00ns INFO     cocotb.casr_30                     Step 49: state = -1258636832243842907 (0xEE886C7838E200A5) - VALID
+   560.00ns INFO     cocotb.casr_30                     Step 50: state = 2512065813686976956 (0x22DCA68C4D3701BC) - VALID
+   570.00ns INFO     cocotb.casr_30                     Step 51: state = 8522986252231869062 (0x7647BAD6F5D18286) - VALID
+   580.00ns INFO     cocotb.casr_30                     Step 52: state = -7788823470403828021 (0x93E88A52145AC6CB) - VALID
+   590.00ns INFO     cocotb.casr_30                     Step 53: state = -275322250456307080 (0xFC2DDBDF36CA6A78) - VALID
+   600.00ns INFO     cocotb.casr_30                     Step 54: state = 460572509440027533 (0x06644841D27BAB8D) - VALID
+   610.00ns INFO     cocotb.casr_30                     Step 55: state = -8376980207666943787 (0x8BBEFCE25F88A8D5) - VALID
+   620.00ns INFO     cocotb.casr_30                     Step 56: state = -2845704078504383148 (0xD8820737C0DDAD54) - VALID
+   630.00ns INFO     cocotb.casr_30                     Step 57: state = 5604459051875607895 (0x4DC709D06144A557) - VALID
+   640.00ns INFO     cocotb.casr_30                     Step 58: state = 8388409884759014737 (0x74699E58B36FBD51) - VALID
+   650.00ns INFO     cocotb.casr_30                     Step 59: state = 1634494187026023771 (0x16AEE3CD9D20855B) - VALID
+   660.00ns INFO     cocotb.casr_30                     Step 60: state = -5574835712052572855 (0xB2A23474E5F1CD49) - VALID
+   670.00ns INFO     cocotb.casr_30                     Step 61: state = -7010039087430470274 (0x9EB756973C1A757E) - VALID
+   680.00ns INFO     cocotb.casr_30                     Step 62: state = -2120822751149452030 (0xE29152F1C62B9502) - VALID
+   690.00ns INFO     cocotb.casr_30                     Step 63: state = 3961863764766684550 (0x36FB5E1A6B68F586) - VALID
+   700.00ns INFO     cocotb.casr_30                     Step 64: state = 5911329840701445323 (0x5209432BA92D14CB) - VALID
+   710.00ns INFO     cocotb.casr_30                     Step 65: state = 6854309207939069817 (0x5F1F65E8AFE5B779) - VALID
+   720.00ns INFO     cocotb.casr_30                     Step 66: state = 4729127250375250191 (0x41A13C2DA03C910F) - VALID
+   730.00ns INFO     cocotb.casr_30                     Step 67: state = 7112246372304681873 (0x62B3C664B047FB91) - VALID
+   740.00ns INFO     cocotb.casr_30                     Step 68: state = 3935138645063239931 (0x369C6BBF98E808FB) - VALID
+   750.00ns INFO     cocotb.casr_30                     Step 69: state = -3249724809412862711 (0xD2E6A880ED2C1D09) - VALID
+   760.00ns INFO     cocotb.casr_30                     Step 70: state = 6789930433290577310 (0x5E3AADC125E6259E) - VALID
+   770.00ns INFO     cocotb.casr_30                     Step 71: state = -4374503338696540957 (0xC34AA463FC3B7CE3) - VALID
+   780.00ns INFO     cocotb.casr_30                     Step 72: state = 7312366625398261556 (0x657ABEB406490734) - VALID
+   790.00ns INFO     cocotb.casr_30                     Step 73: state = -4824900469816063530 (0xBD0A82960BFF89D6) - VALID
+   800.00ns INFO     cocotb.casr_30                     Step 74: state = -8819518172869632430 (0x859AC6F31800DE52) - VALID
+   810.00ns INFO     cocotb.casr_30                     Step 75: state = -3681013069749599266 (0xCCEA6A1DAC0143DE) - VALID
+   820.00ns INFO     cocotb.casr_30                     Step 76: state = 8587145288404395074 (0x772BAB24A6036442) - VALID
+   830.00ns INFO     cocotb.casr_30                     Step 77: state = -7932903827793690905 (0x91E8A9FFBB053EE7) - VALID
+   840.00ns INFO     cocotb.casr_30                     Step 78: state = -419487872944586184 (0xFA2DAE00898DC238) - VALID
+   850.00ns INFO     cocotb.casr_30                     Step 79: state = 820960260517029709 (0x0B64A301DED4674D) - VALID
+   860.00ns INFO     cocotb.casr_30                     Step 80: state = -7403999691310450315 (0x993FB5824256B975) - VALID
+   870.00ns INFO     cocotb.casr_30                     Step 81: state = -1170772316807590124 (0xEFC094C7E7D28F14) - VALID
+   880.00ns INFO     cocotb.casr_30                     Step 82: state = 2333418108949025207 (0x2061F768385ED1B7) - VALID
+   890.00ns INFO     cocotb.casr_30                     Step 83: state = -1102800076788311407 (0xF0B2112C4CC25A91) - VALID
+   900.00ns INFO     cocotb.casr_30                     Step 84: state = 1846260235424484090 (0x199F3BE6F767CAFA) - VALID
+   910.00ns INFO     cocotb.casr_30                     Step 85: state = 3378201347227154955 (0x2EE1C83A11387A0B) - VALID
+   920.00ns INFO     cocotb.casr_30                     Step 86: state = -2147517409734653159 (0xE2327C4B3BCC8B19) - VALID
+   930.00ns INFO     cocotb.casr_30                     Step 87: state = 3990056202241825198 (0x375F86F9C877D9AE) - VALID
+   940.00ns INFO     cocotb.casr_30                     Step 88: state = 5854901679149829795 (0x5140CA0E7C904EA3) - VALID
+   950.00ns INFO     cocotb.casr_30                     Step 89: state = 6584679454008210101 (0x5B617B1387F8F2B5) - VALID
+   960.00ns INFO     cocotb.casr_30                     Step 90: state = 5274570294995787413 (0x493309BCC80D1E95) - VALID
+   970.00ns INFO     cocotb.casr_30                     Step 91: state = 9213694717409469173 (0x7FDD9E877C15A2F5) - VALID
+   980.00ns INFO     cocotb.casr_30                     Step 92: state = 19389651436746261 (0x0044E2C90634B615) - VALID
+   990.00ns INFO     cocotb.casr_30                     Step 93: state = -9156039595994410187 (0x80EF367F8B579335) - VALID
+  1000.00ns INFO     cocotb.casr_30                     Step 94: state = -4530107199802769964 (0xC121D380D950FDD4) - VALID
+  1010.00ns INFO     cocotb.casr_30                     Step 95: state = 7201920739448521815 (0x63F25CC14F590457) - VALID
+  1020.00ns INFO     cocotb.casr_30                     Step 96: state = 3755939844167012049 (0x341FC763714F8ED1) - VALID
+  1030.00ns INFO     cocotb.casr_30                     Step 97: state = -3017296073523670437 (0xD62069351B70D25B) - VALID
+  1040.00ns INFO     cocotb.casr_30                     Step 98: state = 6012498834739519432 (0x5370AFD5A9195FC8) - VALID
+  1050.00ns INFO     cocotb.casr_30                     Step 99: state = -2514802631324516228 (0xDD19A054AFAF407C) - VALID
+  1100.00ns INFO     cocotb.casr_30                     Generate complete
+  1100.00ns INFO     cocotb.casr_30                     Valid outputs count: 100
+  1100.00ns INFO     cocotb.casr_30                     Comparing test to model
+  1100.00ns INFO     cocotb.casr_30                     Match at step 0: test=-3277053635541323643, model=-3277053635541323643
+  1100.00ns INFO     cocotb.casr_30                     Match at step 1: test=6831111500370565580, model=6831111500370565580
+  1100.00ns INFO     cocotb.casr_30                     Match at step 2: test=-4434065890305716618, model=-4434065890305716618
+  1100.00ns INFO     cocotb.casr_30                     Match at step 3: test=7462919751958426514, model=7462919751958426514
+  1100.00ns INFO     cocotb.casr_30                     Match at step 4: test=-5117527272562385665, model=-5117527272562385665
+  1100.00ns INFO     cocotb.casr_30                     Match at step 5: test=-8283740318321809664, model=-8283740318321809664
+  1100.00ns INFO     cocotb.casr_30                     Match at step 6: test=-3054774004271466111, model=-3054774004271466111
+  1100.00ns INFO     cocotb.casr_30                     Match at step 7: test=6118533494599962306, model=6118533494599962306
+  1100.00ns INFO     cocotb.casr_30                     Match at step 8: test=-2941065543876840857, model=-2941065543876840857
+  1100.00ns INFO     cocotb.casr_30                     Match at step 9: test=5900215294621032376, model=5900215294621032376
+  1100.00ns INFO     cocotb.casr_30                     Match at step 10: test=-2723997350751969140, model=-2723997350751969140
+  1100.00ns INFO     cocotb.casr_30                     Match at step 11: test=5431246939517497815, model=5431246939517497815
+  1100.00ns INFO     cocotb.casr_30                     Match at step 12: test=8737172227428145745, model=8737172227428145745
+  1100.00ns INFO     cocotb.casr_30                     Match at step 13: test=1108352041193130971, model=1108352041193130971
+  1100.00ns INFO     cocotb.casr_30                     Match at step 14: test=-7984129034038708151, model=-7984129034038708151
+  1100.00ns INFO     cocotb.casr_30                     Match at step 15: test=-297616795152085762, model=-297616795152085762
+  1100.00ns INFO     cocotb.casr_30                     Match at step 16: test=595242245065381634, model=595242245065381634
+  1100.00ns INFO     cocotb.casr_30                     Match at step 17: test=2082508736733442439, model=2082508736733442439
+  1100.00ns INFO     cocotb.casr_30                     Match at step 18: test=-6396568671887615287, model=-6396568671887615287
+  1100.00ns INFO     cocotb.casr_30                     Match at step 19: test=-5059127181007803778, model=-5059127181007803778
+  1100.00ns INFO     cocotb.casr_30                     Match at step 20: test=-8179730206370387070, model=-8179730206370387070
+  1100.00ns INFO     cocotb.casr_30                     Match at step 21: test=-3204198357783893818, model=-3204198357783893818
+  1100.00ns INFO     cocotb.casr_30                     Match at step 22: test=6691428729601305962, model=6691428729601305962
+  1100.00ns INFO     cocotb.casr_30                     Match at step 23: test=-4087146355950443221, model=-4087146355950443221
+  1100.00ns INFO     cocotb.casr_30                     Match at step 24: test=7595561675334008296, model=7595561675334008296
+  1100.00ns INFO     cocotb.casr_30                     Match at step 25: test=-5823917729697332180, model=-5823917729697332180
+  1100.00ns INFO     cocotb.casr_30                     Match at step 26: test=-6780874422489526681, model=-6780874422489526681
+  1100.00ns INFO     cocotb.casr_30                     Match at step 27: test=-5603319386459180104, model=-5603319386459180104
+  1100.00ns INFO     cocotb.casr_30                     Match at step 28: test=-6970016862073807731, model=-6970016862073807731
+  1100.00ns INFO     cocotb.casr_30                     Match at step 29: test=-2203162983152425004, model=-2203162983152425004
+  1100.00ns INFO     cocotb.casr_30                     Match at step 30: test=3686049071344990295, model=3686049071344990295
+  1100.00ns INFO     cocotb.casr_30                     Match at step 31: test=-2451916228329616175, model=-2451916228329616175
+  1100.00ns INFO     cocotb.casr_30                     Match at step 32: test=4904307722708350810, model=4904307722708350810
+  1100.00ns INFO     cocotb.casr_30                     Match at step 33: test=-1292271184275664565, model=-1292271184275664565
+  1100.00ns INFO     cocotb.casr_30                     Match at step 34: test=2538098720301054840, model=2538098720301054840
+  1100.00ns INFO     cocotb.casr_30                     Match at step 35: test=8489273557680523532, model=8489273557680523532
+  1100.00ns INFO     cocotb.casr_30                     Match at step 36: test=-7750671461162213482, model=-7750671461162213482
+  1100.00ns INFO     cocotb.casr_30                     Match at step 37: test=-677733185820712718, model=-677733185820712718
+  1100.00ns INFO     cocotb.casr_30                     Match at step 38: test=1363558688638284062, model=1363558688638284062
+  1100.00ns INFO     cocotb.casr_30                     Match at step 39: test=4478501324394240931, model=4478501324394240931
+  1100.00ns INFO     cocotb.casr_30                     Match at step 40: test=-4361078945589303115, model=-4361078945589303115
+  1100.00ns INFO     cocotb.casr_30                     Match at step 41: test=7281146814010633620, model=7281146814010633620
+  1100.00ns INFO     cocotb.casr_30                     Match at step 42: test=-4784979368499780362, model=-4784979368499780362
+  1100.00ns INFO     cocotb.casr_30                     Match at step 43: test=-8868481687793615086, model=-8868481687793615086
+  1100.00ns INFO     cocotb.casr_30                     Match at step 44: test=-3519740960248184386, model=-3519740960248184386
+  1100.00ns INFO     cocotb.casr_30                     Match at step 45: test=8212669348540867202, model=8212669348540867202
+  1100.00ns INFO     cocotb.casr_30                     Match at step 46: test=-7345540974718830905, model=-7345540974718830905
+  1100.00ns INFO     cocotb.casr_30                     Match at step 47: test=-1508357079760203160, model=-1508357079760203160
+  1100.00ns INFO     cocotb.casr_30                     Match at step 48: test=3007214655754928045, model=3007214655754928045
+  1100.00ns INFO     cocotb.casr_30                     Match at step 49: test=-1258636832243842907, model=-1258636832243842907
+  1100.00ns INFO     cocotb.casr_30                     Match at step 50: test=2512065813686976956, model=2512065813686976956
+  1100.00ns INFO     cocotb.casr_30                     Match at step 51: test=8522986252231869062, model=8522986252231869062
+  1100.00ns INFO     cocotb.casr_30                     Match at step 52: test=-7788823470403828021, model=-7788823470403828021
+  1100.00ns INFO     cocotb.casr_30                     Match at step 53: test=-275322250456307080, model=-275322250456307080
+  1100.00ns INFO     cocotb.casr_30                     Match at step 54: test=460572509440027533, model=460572509440027533
+  1100.00ns INFO     cocotb.casr_30                     Match at step 55: test=-8376980207666943787, model=-8376980207666943787
+  1100.00ns INFO     cocotb.casr_30                     Match at step 56: test=-2845704078504383148, model=-2845704078504383148
+  1100.00ns INFO     cocotb.casr_30                     Match at step 57: test=5604459051875607895, model=5604459051875607895
+  1100.00ns INFO     cocotb.casr_30                     Match at step 58: test=8388409884759014737, model=8388409884759014737
+  1100.00ns INFO     cocotb.casr_30                     Match at step 59: test=1634494187026023771, model=1634494187026023771
+  1100.00ns INFO     cocotb.casr_30                     Match at step 60: test=-5574835712052572855, model=-5574835712052572855
+  1100.00ns INFO     cocotb.casr_30                     Match at step 61: test=-7010039087430470274, model=-7010039087430470274
+  1100.00ns INFO     cocotb.casr_30                     Match at step 62: test=-2120822751149452030, model=-2120822751149452030
+  1100.00ns INFO     cocotb.casr_30                     Match at step 63: test=3961863764766684550, model=3961863764766684550
+  1100.00ns INFO     cocotb.casr_30                     Match at step 64: test=5911329840701445323, model=5911329840701445323
+  1100.00ns INFO     cocotb.casr_30                     Match at step 65: test=6854309207939069817, model=6854309207939069817
+  1100.00ns INFO     cocotb.casr_30                     Match at step 66: test=4729127250375250191, model=4729127250375250191
+  1100.00ns INFO     cocotb.casr_30                     Match at step 67: test=7112246372304681873, model=7112246372304681873
+  1100.00ns INFO     cocotb.casr_30                     Match at step 68: test=3935138645063239931, model=3935138645063239931
+  1100.00ns INFO     cocotb.casr_30                     Match at step 69: test=-3249724809412862711, model=-3249724809412862711
+  1100.00ns INFO     cocotb.casr_30                     Match at step 70: test=6789930433290577310, model=6789930433290577310
+  1100.00ns INFO     cocotb.casr_30                     Match at step 71: test=-4374503338696540957, model=-4374503338696540957
+  1100.00ns INFO     cocotb.casr_30                     Match at step 72: test=7312366625398261556, model=7312366625398261556
+  1100.00ns INFO     cocotb.casr_30                     Match at step 73: test=-4824900469816063530, model=-4824900469816063530
+  1100.00ns INFO     cocotb.casr_30                     Match at step 74: test=-8819518172869632430, model=-8819518172869632430
+  1100.00ns INFO     cocotb.casr_30                     Match at step 75: test=-3681013069749599266, model=-3681013069749599266
+  1100.00ns INFO     cocotb.casr_30                     Match at step 76: test=8587145288404395074, model=8587145288404395074
+  1100.00ns INFO     cocotb.casr_30                     Match at step 77: test=-7932903827793690905, model=-7932903827793690905
+  1100.00ns INFO     cocotb.casr_30                     Match at step 78: test=-419487872944586184, model=-419487872944586184
+  1100.00ns INFO     cocotb.casr_30                     Match at step 79: test=820960260517029709, model=820960260517029709
+  1100.00ns INFO     cocotb.casr_30                     Match at step 80: test=-7403999691310450315, model=-7403999691310450315
+  1100.00ns INFO     cocotb.casr_30                     Match at step 81: test=-1170772316807590124, model=-1170772316807590124
+  1100.00ns INFO     cocotb.casr_30                     Match at step 82: test=2333418108949025207, model=2333418108949025207
+  1100.00ns INFO     cocotb.casr_30                     Match at step 83: test=-1102800076788311407, model=-1102800076788311407
+  1100.00ns INFO     cocotb.casr_30                     Match at step 84: test=1846260235424484090, model=1846260235424484090
+  1100.00ns INFO     cocotb.casr_30                     Match at step 85: test=3378201347227154955, model=3378201347227154955
+  1100.00ns INFO     cocotb.casr_30                     Match at step 86: test=-2147517409734653159, model=-2147517409734653159
+  1100.00ns INFO     cocotb.casr_30                     Match at step 87: test=3990056202241825198, model=3990056202241825198
+  1100.00ns INFO     cocotb.casr_30                     Match at step 88: test=5854901679149829795, model=5854901679149829795
+  1100.00ns INFO     cocotb.casr_30                     Match at step 89: test=6584679454008210101, model=6584679454008210101
+  1100.00ns INFO     cocotb.casr_30                     Match at step 90: test=5274570294995787413, model=5274570294995787413
+  1100.00ns INFO     cocotb.casr_30                     Match at step 91: test=9213694717409469173, model=9213694717409469173
+  1100.00ns INFO     cocotb.casr_30                     Match at step 92: test=19389651436746261, model=19389651436746261
+  1100.00ns INFO     cocotb.casr_30                     Match at step 93: test=-9156039595994410187, model=-9156039595994410187
+  1100.00ns INFO     cocotb.casr_30                     Match at step 94: test=-4530107199802769964, model=-4530107199802769964
+  1100.00ns INFO     cocotb.casr_30                     Match at step 95: test=7201920739448521815, model=7201920739448521815
+  1100.00ns INFO     cocotb.casr_30                     Match at step 96: test=3755939844167012049, model=3755939844167012049
+  1100.00ns INFO     cocotb.casr_30                     Match at step 97: test=-3017296073523670437, model=-3017296073523670437
+  1100.00ns INFO     cocotb.casr_30                     Match at step 98: test=6012498834739519432, model=6012498834739519432
+  1100.00ns INFO     cocotb.casr_30                     Match at step 99: test=-2514802631324516228, model=-2514802631324516228
+  1100.00ns INFO     cocotb.casr_30                     Comparison complete
+  1100.00ns INFO     cocotb.casr_30                     Matching outputs: 100
+  1100.00ns INFO     cocotb.casr_30                     ========== ALL TESTS PASSED ==========
+  1100.00ns INFO     cocotb.regression                  test1.test1 passed
+  1100.00ns INFO     cocotb.regression                  **************************************************************************************
+                                                        ** TEST                          STATUS  SIM TIME (ns)  REAL TIME (s)  RATIO (ns/s) **
+                                                        **************************************************************************************
+                                                        ** test1.test1                    PASS        1100.00           0.04      28901.95  **
+                                                        **************************************************************************************
+                                                        ** TESTS=1 PASS=1 FAIL=0 SKIP=0               1100.00           0.04      26581.25  **
+                                                        **************************************************************************************
+make[1]: Leaving directory '/mnt/e/vhdl/RNG/casr/verif/casr30/casr30_test1'

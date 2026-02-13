@@ -12,6 +12,10 @@ from cocotb.triggers import RisingEdge, ClockCycles
 from helper import *
 from casr_30 import *
 
+
+# Test 1 :-
+# Produce 100 valid outputs
+
 def hex_to_signed(hex_str, bits=64):
     h = hex_str[2:-1] if hex_str.startswith('x"') else hex_str
     val = int(h, 16)
@@ -19,7 +23,7 @@ def hex_to_signed(hex_str, bits=64):
 
 @cocotb.test()
 async def test1(dut):
-    test_sample = 101
+    test_sample = 100
 
     # Start Clock 100MHz
     clock = Clock(dut.clk, 10, unit="ns")
@@ -57,11 +61,16 @@ async def test1(dut):
     dut._log.info("Seed loaded")
     outputs = []
     counter = 0
+    invalid = 0
     
     while True:
+        if invalid == 10:
+            break
         await RisingEdge(dut.clk)
-        if counter == test_sample-1:
+        if counter == test_sample:
            break
+        if counter == test_sample-3:
+            dut.gen_i.value = 0
         
         if dut.valid_o.value == 1:
             outputs.append(dut.state_o.value.to_signed())
@@ -69,9 +78,7 @@ async def test1(dut):
             counter += 1
         else:
             dut._log.info(f"Step {counter}: waiting... - NOT VALID YET")
-        if counter == test_sample-2:
-            dut.gen_i.value = 0
-
+            invalid += 1
     await ClockCycles(dut.clk, 4)
     dut._log.info("Generate complete")
     dut._log.info(f"Valid outputs count: {len(outputs)}")
@@ -89,6 +96,7 @@ async def test1(dut):
     for i in range(len(outputs)):
         if outputs[i] != hex_to_signed(model_outputs[i]):
             dut._log.error(f"Mismatch at step {i}: test={outputs[i]}, model={hex_to_signed(model_outputs[i])}")
+            invalid += 1
         else:
             dut._log.info(f"Match at step {i}: test={outputs[i]}, model={hex_to_signed(model_outputs[i])}")
             matching += 1

@@ -10,7 +10,7 @@ CASR_SRC_DIR := $(abspath $(MAKEFILE_DIR)/../../..)
 VHDL_SOURCES = $(CASR_SRC_DIR)/casr_30.vhd
 
 TOPLEVEL = casr_30
-COCOTB_TEST_MODULES = test1
+COCOTB_TEST_MODULES = test2
 
 # Use GHDL or ModelSim/Questa
 SIM = ghdl
