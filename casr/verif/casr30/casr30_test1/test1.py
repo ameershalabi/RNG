@@ -25,7 +25,7 @@ def hex_to_signed(hex_str, bits=64):
 async def test1(dut):
     test_sample = 100
 
-    # Start Clock 100MHz
+    # Start Clock at 100MHz
     clock = Clock(dut.clk, 10, unit="ns")
     cocotb.start_soon(clock.start())
 
@@ -38,7 +38,7 @@ async def test1(dut):
     dut.init_i.value = 0
     dut.gen_i.value = 0
 
-    await ClockCycles(dut.clk, 2)
+    await RisingEdge(dut.clk)
 
     dut.rst.value = 1
     dut.clr.value = 1
@@ -48,10 +48,11 @@ async def test1(dut):
     dut._log.info("Reset complete")
     dut._log.info("Enabled")
     dut._log.info("Clear complete")
-
+    
+    # load the seed and initilize the generator
     dut.clr.value = 0
-    dut.gen_i.value = 1
     await RisingEdge(dut.clk)
+    dut.gen_i.value = 1
     dut.init_i.value = 1
     
     SEED = 0x36BD0F75A4ABE07D
@@ -63,6 +64,7 @@ async def test1(dut):
     counter = 0
     invalid = 0
     
+    # start generating
     while True:
         if invalid == 10:
             break
@@ -82,15 +84,15 @@ async def test1(dut):
     await ClockCycles(dut.clk, 4)
     dut._log.info("Generate complete")
     dut._log.info(f"Valid outputs count: {len(outputs)}")
-    # dut._log.info(f"Valid outputs: {outputs}")
 
     dut._log.info("Comparing test to model")
 
-    # convert the seed to a list of bits
+    # convert the seed to a list of bits to feed into the model
     signed_value = SEED & ((1 << 64) - 1)
     SEED = [int(b) for b in format(signed_value, '064b')][::-1]
     model = casr_30(SEED, mode='p')
 
+    # generate the outputs from the model
     model_outputs = prep_out(model.generate(test_sample),64)
     matching = 0
     for i in range(len(outputs)):

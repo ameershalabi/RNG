@@ -16,8 +16,6 @@ COCOTB_TEST_MODULES = test2
 SIM = ghdl
 
 # Generics (compile-time parameters)
-# Note: o_bit_g and o_mode_g use defaults from VHDL ('0' and '0')
-# GHDL has issues with std_logic generics on command line
 SIM_ARGS += -gw_casr_g=64 -go_mode_g=\'1\'
 SIM_ARGS += --vcd=sim.vcd
 include $(shell cocotb-config --makefiles)/Makefile.sim
