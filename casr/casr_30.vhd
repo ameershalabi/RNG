@@ -5,7 +5,7 @@
 -- File        : casr_30.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Created     : Fri Jan  9 14:22:18 2026
--- Last update : Tue Feb 10 15:15:17 2026
+-- Last update : Sat Mar 21 10:54:17 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -53,6 +53,7 @@ architecture arch of casr_30 is
 
   signal clr_r : std_logic;
   signal enb_r : std_logic;
+  signal init_r : std_logic;
   signal gen_r : std_logic;
 
   -- extended casr for generating the next state
@@ -143,18 +144,20 @@ begin
 
   begin
     if (rst = '0') then
+      init_r       <= '0';
       gen_r        <= '0';
       gen_valid_r  <= '0';
       seed_valid_r <= '0';
       ext_casr_r   <= (others => '0');
     elsif rising_edge(clk) then
       if (enb_r = '1') then
+        init_r <= init_i;
         gen_r <= gen_i;
         -- output is invalid by default
         gen_valid_r <= '0';
 
-        -- load the seed when init_i is high
-        if (init_i = '1') then
+        -- load the seed when init_r is high
+        if (init_r = '1') then
           ext_casr_r(w_casr_g downto 1) <= seed_i;
           -- connect LSBext to the MSB of state
           ext_casr_r(0) <= seed_i(w_casr_g-1);
@@ -165,7 +168,7 @@ begin
           gen_valid_r  <= '0';
           seed_valid_r <= '1';
 
-        -- if gen_i is high and init_i is low,
+        -- if gen_i is high and init_r is low,
         -- generate the next state by applying the 
         -- expression on the left bit, state bit, and
         -- right bit
@@ -196,6 +199,7 @@ begin
           ext_casr_r <= new_ext_casr_v;
         end if;
         if (clr_r = '1') then
+          init_r       <= '0';
           gen_r        <= '0';
           gen_valid_r  <= '0';
           seed_valid_r <= '0';
