@@ -5,7 +5,7 @@
 -- File        : casr_30.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Created     : Fri Jan  9 14:22:18 2026
--- Last update : Sat Mar 21 10:54:17 2026
+-- Last update : Sat Mar 21 12:14:37 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -155,6 +155,7 @@ begin
         gen_r <= gen_i;
         -- output is invalid by default
         gen_valid_r <= '0';
+        new_ext_casr_v := (others  => '0');
 
         -- load the seed when init_r is high
         if (init_r = '1') then

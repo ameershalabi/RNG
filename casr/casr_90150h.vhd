@@ -5,7 +5,7 @@
 -- File        : casr_90150h.vhd
 -- Author      : Ameer Shalabi <ameershalabi94@gmail.com>
 -- Created     : Sun Jan 11 10:20:17 2026
--- Last update : Sat Mar 21 10:57:03 2026
+-- Last update : Sat Mar 21 12:14:29 2026
 -- Platform    : -
 -- Standard    : VHDL-2008
 --------------------------------------------------------------------------------
@@ -163,6 +163,7 @@ begin
         gen_valid_r <= '0';
         init_r      <= init_i;
         gen_r       <= gen_i;
+        new_ext_casr_v := (others  => '0');
 
         -- load the seed when init_r is high
         if (init_r = '1') then
